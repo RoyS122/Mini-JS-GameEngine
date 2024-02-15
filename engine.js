@@ -36,7 +36,7 @@ class Game {
         
         for(let i = 0; i < this.GameObjects.length; i ++) { // running through the list of objects they are not in a specific room
             // Draw
-            this.GameObjects[i].sprite.draw()
+            this.GameObjects[i].draw()
             // Step Events
             this.GameObjects[i].onStep()
             // On kill event
@@ -83,7 +83,13 @@ class GameObject {
     constructor(name) {
        this.x = 0
        this.y = 0
-       this.sprite = new Sprite(name, this)
+       this.sprite = new Sprite(name)
+    }
+    
+    draw() {
+        this.sprite.x = this.x
+        this.sprite.y = this.y
+        this.sprite.draw()
     }
 
     
@@ -93,10 +99,8 @@ class GameObject {
 }
 
 class Sprite {
-    constructor(name, parent) {
+    constructor(name) {
       //  this.parent = parent
-        this.x = 0
-        this.y = 0
         this.row = 1
         this.col = 1
         this.speed = 0
