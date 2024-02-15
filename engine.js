@@ -9,7 +9,7 @@ class Game {
         this.GameObjects = []
         this.Rooms =  []
         this.CurrentRoom = 0
-        
+
         this.inputs = {};
         this.mouse = {x: 0, y: 0}
 
@@ -82,6 +82,9 @@ class Game {
       
         window.requestAnimationFrame(() => this.gameLoop())
     }
+    keyboard_check(key) {
+        return this.inputs[key] == true
+    }
     
     
 }
@@ -103,6 +106,20 @@ class GameObject {
        this.x = 0
        this.y = 0
        this.sprite = new Sprite(name)
+
+       this.collision = new CollideBox(0, 0, 0, 0)
+
+       this.sprite.image.onload = () => {
+        this.sprite.loaded = true;
+        console.log("image loaded")
+        if (this.collision.fit_to_sprite){
+            this.collision.x = 0
+            this.collision.y = 0
+            this.collision.width = this.sprite.getSize().width
+            this.collision.height = this.sprite.getSize().height
+        }
+    }
+      
     }
     
     draw() {
@@ -110,7 +127,24 @@ class GameObject {
         this.sprite.y = this.y
         this.sprite.draw()
     }
-
+    
+    CollideWith(box,x,y) {
+            if (box instanceof GameObject) {
+                return (
+                    this.collision.x + x < box.x + box.collision.x + box.collision.width &&
+                    this.collision.x + x  + this.collision.width > box.x + box.collision.x&&
+                    this.collision.y + y < box.y + box.collision.y + box.height &&
+                    this.collision.y + y + this.collision.height > box.y + box.collision.y
+                )
+            }
+            return (
+                this.collision.x + x < box.x + box.width &&
+                this.collision.x + x  + this.collision.width > box.x &&
+                this.collision.y + y < box.y + box.height &&
+                this.collision.y + y + this.collision.height > box.y
+            )
+    }
+        
     
    // addSprite(sprite) {
 
@@ -118,7 +152,7 @@ class GameObject {
 }
 
 class Sprite {
-    constructor(name) {
+    constructor(name, z) {
       //  this.parent = parent
         this.row = 1
         this.col = 1
@@ -137,6 +171,7 @@ class Sprite {
         }
         this.image_step = 0
         this.delay = 0
+        this.z = z
         
     }
     
@@ -147,6 +182,7 @@ class Sprite {
         console.log(this.x)
         this.container.style.left = this.x + "px"
         this.container.style.top = this.y + "px"
+        this.container.style.zIndex = this.z
 
         this.container.style.width =  size.width + "px"
         this.container.style.height = size.height + "px"
@@ -183,7 +219,25 @@ class Sprite {
 }
 
 class CollideBox {
+    constructor(x=0, y=0, w=0, h=0, fts=true) {
+        this.x = x
+        this.y = y
+        this.width = w
+        this.height = h
+        this.fit_to_sprite = fts
+    }
 
 }
 
-export {Game, GameObject, CollideBox, Sprite}
+class TileMap {
+    constructor(map, src){
+        this.map = map 
+    }
+
+    draw(){
+
+    }
+}
+
+
+export {Game, GameObject, CollideBox, Sprite, TileMap}
