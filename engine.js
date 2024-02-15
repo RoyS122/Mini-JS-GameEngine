@@ -9,6 +9,25 @@ class Game {
         this.GameObjects = []
         this.Rooms =  []
         this.CurrentRoom = 0
+        
+        this.inputs = {};
+        this.mouse = {x: 0, y: 0}
+
+        document.addEventListener('keydown', (e) => {
+            this.inputs[e.key] = true;
+        }, false);
+        document.addEventListener('keyup', (e) => {
+            this.inputs[e.key] = false;
+        }, false);
+        document.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.x;
+            this.mouse.y = e.y;
+        })
+        document.addEventListener('mouseevent', (e) => {
+            switch (e.button) {
+                
+            }
+        })
 
     }
 
