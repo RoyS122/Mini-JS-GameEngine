@@ -5,9 +5,9 @@ class Game {
 
         document.body.appendChild(this.window)
         this.window.setAttribute("class", "game_window")
-        this.window.textContent = "test"
         this.GameObjects = []
         this.Rooms =  []
+        this.tilemaps = []
         this.CurrentRoom = 0
 
         this.inputs = {};
@@ -50,6 +50,19 @@ class Game {
         
         
     }
+    addTileMap(tm, room=undefined){
+           
+        if (room == undefined) {
+            var id = this.tilemaps.push(tm) - 1 
+            
+            this.window
+            this.window.appendChild(this.tilemaps[id].container)
+        }else{
+            var id = this.Rooms[room].gameObjects.push(go) - 1
+            this.Rooms[room].gameObjects[id].onCreate()
+            this.window.appendChild(this.Rooms[room].gameObjects[id].container)
+        }
+    }
 
     gameLoop() {
         
@@ -83,7 +96,7 @@ class Game {
         window.requestAnimationFrame(() => this.gameLoop())
     }
     keyboard_check(key) {
-        return this.inputs[key] == true
+        return this.inputs[key]
     }
     
     
@@ -179,7 +192,7 @@ class Sprite {
         let delay_target = Math.floor(60 / this.speed)
           
         let size = this.getSize()  
-        console.log(this.x)
+        //console.log(this.x)
         this.container.style.left = this.x + "px"
         this.container.style.top = this.y + "px"
         this.container.style.zIndex = this.z
@@ -189,13 +202,13 @@ class Sprite {
        
         this.container.style.backgroundImage = `url(${this.image.src})`;
         
-        this.container.style.backgroundPosition = String(this.image_step * size.width) + 'px ' + String(Math.floor(this.image_step % this.row * size.height)) + 'px';
+        this.container.style.backgroundPosition = String(this.image_step % this.col * size.width) + 'px ' + String(Math.floor(this.image_step / this.row) * size.height) + 'px';
         
         this.delay += 1 
         if (delay_target == this.delay) {
             this.delay = 0 
             this.image_step = (this.image_step + 1) % (this.col * this.row)
-            console.log(this.container.style.backgroundPosition)
+        //    console.log(this.container.style.backgroundPosition)
         }
        
     }
@@ -230,14 +243,69 @@ class CollideBox {
 }
 
 class TileMap {
-    constructor(map, src){
+    constructor(map, src, name, z = 0, col = 1, row = 1){
         this.map = map 
+        this.src = src
+        this.col = col
+        this.row = row
+        this.img = new Image()
+    
+        this.img.src = src
+        this.container = document.createElement("div")
+        this.container.id = name
+        this.container.style.zIndex = z
+        this.divmap = []
+        this.img.onload = () => {
+            console.log("map loaded")
+            
+            this.updateMap()
+           
+            console.log(this.divmap)
+        }
+       
     }
 
-    draw(){
+    updateMap() {
+        console.log(this.map)
+        for(let i = 0; i < this.divmap.length; i ++) {
+            this.container.removeChild(this.divmap[i])
+        }
 
+        console.log(this.map[0].length)
+        
+        this.divmap = []
+        for(let i = 0; i < this.map.length; i ++) {
+            console.log(i)
+            for(let j = 0; j < this.map[0].length; j++){
+                console.log(j)
+                let temp = document.createElement("div")
+                temp.style.position = "absolute";
+                console.log(String(j * (this.img.width / this.col)))
+                temp.style.left = String(j * (this.img.width / this.col)) + "px"
+                temp.style.top = String(i * (this.img.height / this.row)) + "px"
+                console.log(`url(${this.img.src})`)
+                temp.style.backgroundImage = `url(${this.img.src})`;
+                console.log(String(this.img.width / this.col * j) + 'px ' + String(this.img.height / this.row * i) + 'px')
+                temp.style.backgroundPosition = String(this.img.width / this.col * j) + 'px ' + String(this.img.height / this.row * i) + 'px';
+                temp.style.width = String(this.img.width / this.col) +"px"
+                temp.style.height = String(this.img.height / this.col) + "px"
+                this.divmap.push(temp)
+                this.container.appendChild(temp)
+            }
+        } 
+        
     }
 }
 
 
+
+// class TileSet {
+//     constructor(name) {
+        
+//     }
+// }
+
+class Menu {
+
+}
 export {Game, GameObject, CollideBox, Sprite, TileMap}
