@@ -14,7 +14,7 @@ class Game {
         this.mouse = {x: 0, y: 0}
 
         document.addEventListener('keydown', (e) => {
-            this.inputs[e.key] = true;
+            this.inputs[e.key] = true; 
         }, false);
         document.addEventListener('keyup', (e) => {
             this.inputs[e.key] = false;
@@ -131,6 +131,7 @@ class GameObject {
             this.collision.width = this.sprite.getSize().width
             this.collision.height = this.sprite.getSize().height
         }
+        this.kill = false
     }
       
     }
@@ -144,10 +145,10 @@ class GameObject {
     CollideWith(box,x,y) {
             if (box instanceof GameObject) {
                 return (
-                    this.collision.x + x < box.x + box.collision.x + box.collision.width &&
-                    this.collision.x + x  + this.collision.width > box.x + box.collision.x&&
-                    this.collision.y + y < box.y + box.collision.y + box.height &&
-                    this.collision.y + y + this.collision.height > box.y + box.collision.y
+                    (x + this.collision.x < box.x + box.collision.width) &&
+                    (x + this.collision.x + this.collision.width > box.x + box.collision.x) &&
+                    (x + this.collision.y < box.y + box.collision.height) &&
+                    (y + this.collision.y + this.collision.height > box.y + box.collision.y)
                 )
             }
             return (
@@ -167,12 +168,14 @@ class GameObject {
 class Sprite {
     constructor(name, z) {
       //  this.parent = parent
+        this.scale = 1
         this.row = 1
         this.col = 1
         this.speed = 0
         this.container = document.createElement("div")
         this.container.setAttribute("class", "game_object")
         this.container.style.position = 'absolute'; 
+        this.container.style.imageRendering = "pixelated"
         this.container.setAttribute("id", name)
         this.image = new Image()
         this.container.style.backgroundImage = "" + this.image + ""
@@ -197,8 +200,17 @@ class Sprite {
         this.container.style.top = this.y + "px"
         this.container.style.zIndex = this.z
 
-        this.container.style.width =  size.width + "px"
-        this.container.style.height = size.height + "px"
+        let w_scaled = this.image.width * this.scale
+        let h_scaled = this.image.height * this.scale
+        size.width = size.width * this.scale
+        size.height = size.height * this.scale
+        this.container.style.backgroundSize = w_scaled + "px " + h_scaled +"px"
+
+        this.container.style.width = size.width + "px"
+        this.container.style.height = size.height +"px"
+        
+            
+        
        
         this.container.style.backgroundImage = `url(${this.image.src})`;
         
@@ -227,8 +239,6 @@ class Sprite {
     getSize() {
        return {width: this.image.width / this.col, height: this.image.height / this.row} 
     }
-    
-
 }
 
 class CollideBox {
@@ -243,7 +253,8 @@ class CollideBox {
 }
 
 class TileMap {
-    constructor(map, src, name, z = 0, col = 1, row = 1){
+    constructor(map, src, name, z = 0, col = 1, row = 1, scale = 1){
+        this.scale = scale;
         this.map = map 
         this.src = src
         this.col = col
@@ -264,7 +275,7 @@ class TileMap {
         }
        
     }
-
+    
     updateMap() {
         console.log(this.map)
         for(let i = 0; i < this.divmap.length; i ++) {
@@ -273,6 +284,8 @@ class TileMap {
 
         console.log(this.map[0].length)
         
+        let tilesize = {width: this.img.width / this.col * this.scale, height: this.img.height / this.row * this.scale}
+        
         this.divmap = []
         for(let i = 0; i < this.map.length; i ++) {
             console.log(i)
@@ -280,15 +293,23 @@ class TileMap {
                 console.log(j)
                 let temp = document.createElement("div")
                 temp.style.position = "absolute";
-                console.log(String(j * (this.img.width / this.col)))
-                temp.style.left = String(j * (this.img.width / this.col)) + "px"
+            //    console.log(String(j * (this.img.width / this.col)))
+               
+                temp.style.left = String(j * tilesize)+ "px"
                 temp.style.top = String(i * (this.img.height / this.row)) + "px"
+               
                 console.log(`url(${this.img.src})`)
+               
                 temp.style.backgroundImage = `url(${this.img.src})`;
-                console.log(String(this.img.width / this.col * j) + 'px ' + String(this.img.height / this.row * i) + 'px')
-                temp.style.backgroundPosition = String(this.img.width / this.col * j) + 'px ' + String(this.img.height / this.row * i) + 'px';
+               
+                let backgroundPosX = "-" + String((this.map[i][j] % this.col) * tilesize.width) + 'px '
+                let backgroundPosY = "-" + String(Math.floor(this.map[i][j] / this.row) * tilesize.height) + 'px'
+                console.log(backgroundPosX, backgroundPosY)
+                console.log("map x:", (this.map[i][j] % this.col), "map y:",Math.floor(this.map[i][j] / this.row ), this.map[i][j])
+               
+                temp.style.backgroundPosition = backgroundPosX + backgroundPosY;
                 temp.style.width = String(this.img.width / this.col) +"px"
-                temp.style.height = String(this.img.height / this.col) + "px"
+                temp.style.height = String(this.img.height / this.row) + "px"
                 this.divmap.push(temp)
                 this.container.appendChild(temp)
             }
