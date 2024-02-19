@@ -93,7 +93,7 @@ class Game {
       
         window.requestAnimationFrame(() => this.gameLoop())
     }
-    keyboard_check(key) {
+    keyboardCheck(key) {
         return this.inputs[key]
     }
     
@@ -113,7 +113,7 @@ class Room {
  }
 
 class GameObject {
-    constructor(name) {
+    constructor(name = "") {
        this.x = 0
        this.y = 0
        this.sprite = new Sprite(name)
@@ -138,6 +138,14 @@ class GameObject {
         this.sprite.x = this.x
         this.sprite.y = this.y
         this.sprite.draw()
+    }
+
+    onStep() {
+
+    }
+
+    onCreate() {
+
     }
     
     CollideWith(box,x,y) {
@@ -251,7 +259,7 @@ class CollideBox {
 }
 
 class TileMap {
-    constructor(map, src, name, z = 0, col = 1, row = 1, scale = 1){
+    constructor(map, src, name = "", z = 0, col = 1, row = 1, scale = 1){
         this.scale = scale;
         this.map = map 
         this.src = src
