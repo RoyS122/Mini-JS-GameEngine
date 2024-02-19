@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 class Game {
     constructor() {
         
@@ -148,19 +150,19 @@ class GameObject {
 
     }
     
-    CollideWith(box,x,y) {
+    collideWith(box,x,y) {
             if (box instanceof GameObject) {
                 return (
                     (x + this.collision.x < box.x + box.collision.width) &&
                     (x + this.collision.x + this.collision.width > box.x + box.collision.x) &&
-                    (x + this.collision.y < box.y + box.collision.height) &&
+                    (y + this.collision.y < box.y + box.collision.height) &&
                     (y + this.collision.y + this.collision.height > box.y + box.collision.y)
                 )
             }
             return (
                 (x + this.collision.x < box.x + box.width) &&
                     (x + this.collision.x + this.collision.width > box.x + box.x) &&
-                    (x + this.collision.y < box.y + box.height) &&
+                    (y + this.collision.y < box.y + box.height) &&
                     (y + this.collision.y + this.collision.height > box.y + box.y)
             )
     }
@@ -259,7 +261,7 @@ class CollideBox {
 }
 
 class TileMap {
-    constructor(map, src, name = "", z = 0, col = 1, row = 1, scale = 1){
+    constructor(map = [[]], src, name = "", z = 0, col = 1, row = 1, scale = 1){
         this.scale = scale;
         this.map = map 
         this.src = src
@@ -336,5 +338,11 @@ class TileMap {
 
 class Menu {
 
+}
+
+function importMapFromJson(path) {
+    var json_map = fs.open("")
+
+    return map_data
 }
 export {Game, GameObject, CollideBox, Sprite, TileMap}
