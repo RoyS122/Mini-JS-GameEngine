@@ -10,12 +10,12 @@ Cette classe est la plus importante de ce moteur, elle permet de mettre en place
 ##### Les methodes 
 - `startGameLoop()` : Cette methode initialise la boucle de jeu, celle ci doit être appelé une fois que tout à été ajouté paramétré avec les methodes qui vont suivre.
 
-- `addObject(go, room)` : **"go"** doit être un objet de la classe [GameObject](#GameObject)
-    room (WIP) Permetra de choisir dans quelle salle de jeu l'objet doit être present (Dans le cas ou le jeu aurait plusieurs environnements très différents qui devraient être gardé actif en simultané)
+- `addObject(go, room)` : **"go"** doit être un objet de la classe [GameObject](#GameObject).
+**"room"** (WIP) Permetra de choisir dans quelle salle de jeu l'objet doit être present (Dans le cas ou le jeu aurait plusieurs environnements très différents qui devraient être gardé actif en simultané)
     Cette methode ajoute l'objet en question à l'instance de jeu.
 
 - `addTileMap(tm, room)` : **"tm"** doit être un objet de la classe [TileMap](#TileMap)
-room (WIP) Permetra de choisir dans quelle salle de jeu la tilemap doit être presente (Dans le cas ou le jeu aurait plusieurs environnements très différents qui devraient être gardé actif en simultané)
+**"room"** (WIP) Permetra de choisir dans quelle salle de jeu la tilemap doit être presente (Dans le cas ou le jeu aurait plusieurs environnements très différents qui devraient être gardé actif en simultané)
 Cette methode ajoute le tilemap en question à l'instance de jeu.
 
 - `keyboardCheck(key)` : "key" doit être une keyvalue en javascript (pour plus d'information voir la liste [ici](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values)) 
