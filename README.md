@@ -34,7 +34,7 @@ Cette methode est appelée à chaque boucle de jeu(60 fois par secondes par defa
 - `onCreate()` : Il est fortement recommandé de ne pas utiliser cette fonction par sois même, laisser cette tache à l'instance de la classe Game auquel il appartient.
 De la même manière que pour *onStep()* cette methode peut être redefinie pour permettre de creer la logique de l'objet dans le jeu.
 ette methode s'execute à l'initialisation de l'objet, on pourra donc y definir tous les attributs non natifs que la logique requiert.
-- `CollideWith(box, x, y)` : **"Box"** peut être soit une instance de [GameObject](#GameObject) soit une instance de [CollideBox](#CollideBox).
+- `collideWith(box, x, y)` : **"Box"** peut être soit une instance de [GameObject](#GameObject) soit une instance de [CollideBox](#CollideBox).
 **"x"** est la position en abscisse ou l'instance parente doit être testée.
 **"y"** est la position en ordonée à laquelle l'instance doit être testée.
 A noter deux choses:
