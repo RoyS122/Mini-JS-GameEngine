@@ -24,9 +24,7 @@ class Game {
             this.mouse.y = e.y;
         })
         document.addEventListener('mouseevent', (e) => {
-            switch (e.button) {
-                
-            }
+            
         })
 
     }
@@ -152,10 +150,10 @@ class GameObject {
                 )
             }
             return (
-                this.collision.x + x < box.x + box.width &&
-                this.collision.x + x  + this.collision.width > box.x &&
-                this.collision.y + y < box.y + box.height &&
-                this.collision.y + y + this.collision.height > box.y
+                (x + this.collision.x < box.x + box.width) &&
+                    (x + this.collision.x + this.collision.width > box.x + box.x) &&
+                    (x + this.collision.y < box.y + box.height) &&
+                    (y + this.collision.y + this.collision.height > box.y + box.y)
             )
     }
         
@@ -281,11 +279,12 @@ class TileMap {
         for(let i = 0; i < this.divmap.length; i ++) {
             this.container.removeChild(this.divmap[i])
         }
+        this.container.style.imageRendering = "pixelated"
 
         console.log(this.map[0].length)
         
         let tilesize = {width: this.img.width / this.col * this.scale, height: this.img.height / this.row * this.scale}
-        
+       
         this.divmap = []
         for(let i = 0; i < this.map.length; i ++) {
             console.log(i)
@@ -295,12 +294,13 @@ class TileMap {
                 temp.style.position = "absolute";
             //    console.log(String(j * (this.img.width / this.col)))
                
-                temp.style.left = String(j * tilesize)+ "px"
-                temp.style.top = String(i * (this.img.height / this.row)) + "px"
+                temp.style.left = String(j * tilesize.width)+ "px"
+                temp.style.top = String(i * tilesize.height) + "px"
                
                 console.log(`url(${this.img.src})`)
                
                 temp.style.backgroundImage = `url(${this.img.src})`;
+                temp.style.backgroundSize = this.img.width * this.scale + "px " + this.img.height * this.scale +"px"
                
                 let backgroundPosX = "-" + String((this.map[i][j] % this.col) * tilesize.width) + 'px '
                 let backgroundPosY = "-" + String(Math.floor(this.map[i][j] / this.row) * tilesize.height) + 'px'
@@ -308,8 +308,8 @@ class TileMap {
                 console.log("map x:", (this.map[i][j] % this.col), "map y:",Math.floor(this.map[i][j] / this.row ), this.map[i][j])
                
                 temp.style.backgroundPosition = backgroundPosX + backgroundPosY;
-                temp.style.width = String(this.img.width / this.col) +"px"
-                temp.style.height = String(this.img.height / this.row) + "px"
+                temp.style.width = String(tilesize.width) +"px"
+                temp.style.height = String(tilesize.height) + "px"
                 this.divmap.push(temp)
                 this.container.appendChild(temp)
             }
