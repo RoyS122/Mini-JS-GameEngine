@@ -18,7 +18,7 @@ Cette classe est la plus importante de ce moteur, elle permet de mettre en place
 **"room"** (WIP) Permetra de choisir dans quelle salle de jeu la tilemap doit être presente (Dans le cas ou le jeu aurait plusieurs environnements très différents qui devraient être gardé actif en simultané)
 Cette methode ajoute le tilemap en question à l'instance de jeu.
 
-- `keyboardCheck(key)` : "key" doit être une keyvalue en javascript (pour plus d'information voir la liste [ici](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values)) 
+- `keyboardCheck(key)` : **"key"** doit être une keyvalue en javascript (pour plus d'information voir la liste [ici](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values)) 
 Cette methode permet de verifier si une touche est appuyée et retourne un booléen.
 
 #### Room 
@@ -34,9 +34,9 @@ Cette methode est appelée à chaque boucle de jeu(60 fois par secondes par defa
 - `onCreate()` : Il est fortement recommandé de ne pas utiliser cette fonction par sois même, laisser cette tache à l'instance de la classe Game auquel il appartient.
 De la même manière que pour *onStep()* cette methode peut être redefinie pour permettre de creer la logique de l'objet dans le jeu.
 ette methode s'execute à l'initialisation de l'objet, on pourra donc y definir tous les attributs non natifs que la logique requiert.
-- `CollideWith(box, x, y)` : Box peut être soit une instance de [GameObject](#GameObject) soit une instance de [CollideBox](#CollideBox).
-x est la position en abscisse ou l'instance parente doit être testée.
-y est la position en ordonée à laquelle l'instance doit être testée.
+- `CollideWith(box, x, y)` : **"Box"** peut être soit une instance de [GameObject](#GameObject) soit une instance de [CollideBox](#CollideBox).
+**"x"** est la position en abscisse ou l'instance parente doit être testée.
+**"y"** est la position en ordonée à laquelle l'instance doit être testée.
 A noter deux choses:
     - x et y sont en pixels
     - l'origine du repère est dans le coin superieur gauche de l'écran de sorte que si ma fenetre fait 100 pixels par 100 pixels (0, 0) serait le coin superieur gauche et (100, 100) le coin inferieur droit.
@@ -53,11 +53,11 @@ Cette methode verifie la superposition de deux elements en se basant sur leur at
 Cette classe est la classe qui permet de creer et afficher les visuels des instances de la classe [GameObject](#GameObject)
 
 ##### Methodes
-- `setImage(path)` : *"path"* doit être le chemin d'accés à la texture.
+- `setImage(path)` : **"path"** doit être le chemin d'accés à la texture.
     Cette methode defini la texture de l'instance parente.
-- `setAnimation(col, row, speed)` : *col* doit être un entier qui indique le nombre de colonnes de la texture.
-    *row* doit être un entier qui indique le nombre de lignes de la texture.
-    *speed* doit être un entiers, limité au nombre d'image par seconde du jeu il indique la vitesse en image par seconde de l'animation.
+- `setAnimation(col, row, speed)` : **"col"** doit être un entier qui indique le nombre de colonnes de la texture.
+    **"row"** doit être un entier qui indique le nombre de lignes de la texture.
+    **"speed"** doit être un entiers, limité au nombre d'image par seconde du jeu il indique la vitesse en image par seconde de l'animation.
     Cette méthode permet d'initialiser l'animation du sprite.
 - `getSize()` : cette methode retourne un dictionnaire avec en index "width" la largeur d'une image de l'animation liées à l'instance parente et en index "height" la hauteur d'une image de l'animation liées à l'instance parente.
 
