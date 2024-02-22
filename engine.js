@@ -1,8 +1,7 @@
-const fs = require("fs");
 
 class Game {
     constructor() {
-        
+
         this.window = document.createElement("div")
 
         document.body.appendChild(this.window)
@@ -16,7 +15,7 @@ class Game {
         this.mouse = {x: 0, y: 0}
 
         document.addEventListener('keydown', (e) => {
-            this.inputs[e.key] = true; 
+            this.inputs[e.key] = true;
         }, false);
         document.addEventListener('keyup', (e) => {
             this.inputs[e.key] = false;
@@ -26,7 +25,7 @@ class Game {
             this.mouse.y = e.y;
         })
         document.addEventListener('mouseevent', (e) => {
-            
+
         })
 
     }
@@ -36,10 +35,10 @@ class Game {
     }
 
     addObject(go, room=undefined) {
-        
+
         if (room == undefined) {
-            var id = this.GameObjects.push(go) - 1 
-          
+            var id = this.GameObjects.push(go) - 1
+
             this.GameObjects[id].onCreate()
             this.window.appendChild(this.GameObjects[id].sprite.container)
         }else{
@@ -47,14 +46,14 @@ class Game {
             this.Rooms[room].gameObjects[id].onCreate()
             this.window.appendChild(this.Rooms[room].gameObjects[id].container)
         }
-        
-        
+
+
     }
     addTileMap(tm, room=undefined){
-           
+
         if (room == undefined) {
-            var id = this.tilemaps.push(tm) - 1 
-            
+            var id = this.tilemaps.push(tm) - 1
+
             this.window
             this.window.appendChild(this.tilemaps[id].container)
         }else{
@@ -65,7 +64,7 @@ class Game {
     }
 
     gameLoop() {
-        
+
         for(let i = 0; i < this.GameObjects.length; i ++) { // running through the list of objects they are not in a specific room
             // Draw
             this.GameObjects[i].draw()
@@ -73,7 +72,7 @@ class Game {
             this.GameObjects[i].onStep()
             // On kill event
             if(this.GameObjects[i].kill == true) {
-                this.GameObjects[i].onKill() 
+                this.GameObjects[i].onKill()
             }
         }
 
@@ -81,25 +80,25 @@ class Game {
             for(let i = 0; i < this.Rooms[this.CurrentRoom].gameObjects; i ++) {
                 // Draw Events
                 this.Rooms[this.CurrentRoom].gameObjects[i].sprite.draw()
-    
+
                 // Step Events
                 this.Rooms[this.CurrentRoom].gameObjects[i].onStep()
-    
-            
+
+
                 if(this.Rooms[this.CurrentRoom].gameObjects[i].kill == true) {
-                    this.Rooms[this.CurrentRoom].gameObjects[i].onKill() 
+                    this.Rooms[this.CurrentRoom].gameObjects[i].onKill()
                 }
             }
         }
-        
-      
+
+
         window.requestAnimationFrame(() => this.gameLoop())
     }
     keyboardCheck(key) {
         return this.inputs[key]
     }
-    
-    
+
+
 }
 
 class Room {
@@ -133,9 +132,9 @@ class GameObject {
         }
         this.kill = false
     }
-      
+
     }
-    
+
     draw() {
         this.sprite.x = this.x
         this.sprite.y = this.y
@@ -149,7 +148,7 @@ class GameObject {
     onCreate() {
 
     }
-    
+
     collideWith(box,x,y) {
             if (box instanceof GameObject) {
                 return (
@@ -166,8 +165,8 @@ class GameObject {
                     (y + this.collision.y + this.collision.height > box.y + box.y)
             )
     }
-        
-    
+
+
    // addSprite(sprite) {
 
     //}
@@ -182,7 +181,7 @@ class Sprite {
         this.speed = 0
         this.container = document.createElement("div")
         this.container.setAttribute("class", "game_object")
-        this.container.style.position = 'absolute'; 
+        this.container.style.position = 'absolute';
         this.container.style.imageRendering = "pixelated"
         this.container.setAttribute("id", name)
         this.image = new Image()
@@ -191,18 +190,18 @@ class Sprite {
         this.image.onload = () => {
             this.loaded = true;
             console.log("image loaded")
-           
+
         }
         this.image_step = 0
         this.delay = 0
         this.z = z
-        
+
     }
-    
+
     draw() { // to be executed in the gamedraw loop, (with a constant tickrate)
         let delay_target = Math.floor(60 / this.speed)
-          
-        let size = this.getSize()  
+
+        let size = this.getSize()
         //console.log(this.x)
         this.container.style.left = this.x + "px"
         this.container.style.top = this.y + "px"
@@ -216,21 +215,21 @@ class Sprite {
 
         this.container.style.width = size.width + "px"
         this.container.style.height = size.height +"px"
-        
-            
-        
-       
+
+
+
+
         this.container.style.backgroundImage = `url(${this.image.src})`;
-        
+
         this.container.style.backgroundPosition = String(this.image_step % this.col * size.width) + 'px ' + String(Math.floor(this.image_step / this.row) * size.height) + 'px';
-        
-        this.delay += 1 
+
+        this.delay += 1
         if (delay_target == this.delay) {
-            this.delay = 0 
+            this.delay = 0
             this.image_step = (this.image_step + 1) % (this.col * this.row)
         //    console.log(this.container.style.backgroundPosition)
         }
-       
+
     }
 
     setAnimation(col = 1, row = 1, speed = 0) {
@@ -245,7 +244,7 @@ class Sprite {
     }
 
     getSize() {
-       return {width: this.image.width / this.col, height: this.image.height / this.row} 
+       return {width: this.image.width / this.col, height: this.image.height / this.row}
     }
 }
 
@@ -261,78 +260,118 @@ class CollideBox {
 }
 
 class TileMap {
-    constructor(map = [[]], src, name = "", z = 0, col = 1, row = 1, scale = 1){
+    constructor(map, z = 0, scale = 1){
         this.scale = scale;
-        this.map = map 
-        this.src = src
-        this.col = col
-        this.row = row
-        this.img = new Image()
-    
-        this.img.src = src
+        this.json_map = map
+
+     
+       // this.src = src
+        //this.col = col
+        //this.row = row
+        this.images_loaded = 0
+        this.images = []
+        console.log(map, "test")
+        for(let i = 0; i < this.json_map.tilesets.length; i ++) {
+            console.log(i)
+            var temp_img = {img: new Image(), min: this.json_map.tilesets[i].firstgid, max: -1}
+            console.log(temp_img)
+            if(i != 0 ) {
+                this.images[i - 1].max = temp_img.min - 1;
+            }
+            
+            temp_img.img.src = this.json_map.tilesets[i].img_url
+            console.log(this.json_map.tilesets[i].img_url)
+            console.log(temp_img)
+            temp_img.img.onload = () => {
+               // console.log(1)
+                this.images_loaded += 1;
+                console.log(this.images_loaded, this.json_map.tilesets.length)
+                if (this.images_loaded == this.json_map.tilesets.length) {
+                    this.updateMap()
+                }
+                console.log(this.images_loaded)
+            }
+            console.log(temp_img)
+            this.images.push(temp_img)
+        }
         this.container = document.createElement("div")
-        this.container.id = name
+        //this.container.id = name
         this.container.style.zIndex = z
         this.divmap = []
-        this.img.onload = () => {
-            console.log("map loaded")
-            
-            this.updateMap()
-           
-            console.log(this.divmap)
-        }
-       
     }
-    
+
+ 
     updateMap() {
-        console.log(this.map)
+        console.log(1, "update")
+        console.log(this.json_map)
+        var map_by_layer = importMapFromJson(this.json_map)
         for(let i = 0; i < this.divmap.length; i ++) {
             this.container.removeChild(this.divmap[i])
         }
         this.container.style.imageRendering = "pixelated"
 
-        console.log(this.map[0].length)
-        
-        let tilesize = {width: this.img.width / this.col * this.scale, height: this.img.height / this.row * this.scale}
-       
+       // console.log(this.map[0].length)
+
+
         this.divmap = []
-        for(let i = 0; i < this.map.length; i ++) {
-            console.log(i)
-            for(let j = 0; j < this.map[0].length; j++){
-                console.log(j)
-                let temp = document.createElement("div")
-                temp.style.position = "absolute";
-            //    console.log(String(j * (this.img.width / this.col)))
-               
-                temp.style.left = String(j * tilesize.width)+ "px"
-                temp.style.top = String(i * tilesize.height) + "px"
-               
-                console.log(`url(${this.img.src})`)
-               
-                temp.style.backgroundImage = `url(${this.img.src})`;
-                temp.style.backgroundSize = this.img.width * this.scale + "px " + this.img.height * this.scale +"px"
-               
-                let backgroundPosX = "-" + String((this.map[i][j] % this.col) * tilesize.width) + 'px '
-                let backgroundPosY = "-" + String(Math.floor(this.map[i][j] / this.row) * tilesize.height) + 'px'
-                console.log(backgroundPosX, backgroundPosY)
-                console.log("map x:", (this.map[i][j] % this.col), "map y:",Math.floor(this.map[i][j] / this.row ), this.map[i][j])
-               
-                temp.style.backgroundPosition = backgroundPosX + backgroundPosY;
-                temp.style.width = String(tilesize.width) +"px"
-                temp.style.height = String(tilesize.height) + "px"
-                this.divmap.push(temp)
-                this.container.appendChild(temp)
-            }
-        } 
         
+        for(let m = 0; m < map_by_layer.length; m ++) {
+            this.addLayer(map_by_layer[m])
+        }
+    }
+
+    addLayer(tm) {
+        console.log(tm, "map")
+        var tilesize = {width: this.json_map.tilewidth * this.scale, height: this.json_map.tileheight * this.scale}
+        
+      //  console.log(json_map)
+        for(let i = 0; i < tm.length; i ++) {
+            console.log(i)
+            for(let j = 0; j < tm[0].length; j++){
+                console.log(this.map)
+                if(tm[i][j] != 0) {
+                    console.log(j)
+                    let temp = document.createElement("div")
+                    temp.style.position = "absolute";
+                    //    console.log(String(j * (this.img.width / this.col)))
+
+                    temp.style.left = String(j * tilesize.width)+ "px"
+                    temp.style.top = String(i * tilesize.height) + "px"
+
+                 //   console.log(`url(${this.img.src})`)   
+                    var tile_value = tm[i][j]
+                    
+                    let ts = this.images[0]
+                    for(let id_ts = 0; tile_value > ts.max && ts.max != -1; id_ts ++){
+                        ts = this.images[id_ts]
+                    }
+                    console.log(ts)
+
+
+
+                    temp.style.backgroundImage = `url(${ts.img.src})`;
+                    temp.style.backgroundSize = ts.img.width * this.scale + "px " + ts.img.height * this.scale +"px"
+                     
+                    let backgroundPosX = "-" + String(((tm[i][j] - ts.min) % this.col) * tilesize.width) + 'px '
+                    let backgroundPosY = "-" + String(Math.floor((tm[i][j] - ts.min) / this.row) * tilesize.height) + 'px'
+                    //  console.log(backgroundPosX, backgroundPosY)
+                    //console.log("map x:", (this.map[i][j] % this.col), "map y:",Math.floor(this.map[i][j] / this.row ), this.map[i][j])
+    
+                    temp.style.backgroundPosition = backgroundPosX + backgroundPosY;
+            
+                    temp.style.width = String(tilesize.width) +"px"
+                    temp.style.height = String(tilesize.height) + "px"
+                    this.divmap.push(temp)
+                    this.container.appendChild(temp)
+                }
+            }
+        }
     }
 }
 
-
-
 // class TileSet {
 //     constructor(name) {
-        
+
 //     }
 // }
 
@@ -340,9 +379,77 @@ class Menu {
 
 }
 
-function importMapFromJson(path) {
-    var json_map = fs.open("")
 
-    return map_data
+async function importJson(path) {
+    return fetch(path)
+    .then(response => {
+      // Vérifiez si la requête a réussi
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse la réponse en JSON
+    })
+    .then(data => {
+      console.log(data);
+      return data // Ici, vous avez accès à vos données JSON
+      // Faites quelque chose avec vos données JSON
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
+
 }
-export {Game, GameObject, CollideBox, Sprite, TileMap}
+async function importMAPJsonFromFile(path) {
+    var json = await importJson(path)
+    console.log(json)
+    for(let i = 0; i < json.tilesets.length; i ++) {
+        console.log(resolveUrl(path, json.tilesets[i].source))
+        
+        json.tilesets[i].tsj = await importJson(resolveUrl(path, json.tilesets[i].source))
+        json.tilesets[i].img_url = resolveUrl(path, resolveUrl(json.tilesets[i].source, json.tilesets[i].tsj.image))
+        
+    }
+    console.log(json, "map")
+    return json
+}
+
+function importMapFromJson(json) {
+        
+        let map_arr = json.layers.map(layer => layer);
+        console.log(map_arr);
+        let map_splited = []
+        for(let i = 0; i < map_arr.length; i ++) {
+            let current_layer = []
+            for(let j = 0; j < map_arr[i].height; j ++) {
+                let current_row = []
+                for(let l = 0; l < map_arr[i].width; l ++) {
+                    current_row.push(map_arr[i].data[j * 20 + l])
+                }
+                current_layer.push(current_row)
+            }
+            map_splited.push(current_layer)
+            
+
+        }
+        
+        return map_splited;
+    
+}
+
+function resolveUrl(base, relative) {
+    var stack = base.split("/"),
+        parts = relative.split("/");
+    stack.pop(); // Enlever le fichier courant (ou vide) de l'URL de base pour obtenir le dossier
+    for (var i = 0; i < parts.length; i++) {
+        if (parts[i] == ".")
+            continue; // Ignorer le segment actuel
+        if (parts[i] == "..")
+            stack.pop(); // Remonter d'un niveau dans l'arborescence
+        else
+            stack.push(parts[i]); // Ajouter le segment au chemin final
+    }
+    return stack.join("/");
+}
+
+
+export {Game, GameObject, CollideBox, Sprite, TileMap, importJson, importMAPJsonFromFile}
