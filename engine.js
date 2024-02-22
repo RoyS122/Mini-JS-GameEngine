@@ -323,12 +323,12 @@ class TileMap {
     addLayer(tm) {
         console.log(tm, "map")
         var tilesize = {width: this.json_map.tilewidth * this.scale, height: this.json_map.tileheight * this.scale}
-        
+        console.log(tilesize)
       //  console.log(json_map)
         for(let i = 0; i < tm.length; i ++) {
             console.log(i)
             for(let j = 0; j < tm[0].length; j++){
-                console.log(this.map)
+             //   console.log(this.map)
                 if(tm[i][j] != 0) {
                     console.log(j)
                     let temp = document.createElement("div")
@@ -347,14 +347,17 @@ class TileMap {
                     }
                     console.log(ts)
 
+                    let row = ts.img.height / this.json_map.tileheight
+                    let col = ts.img.width / this.json_map.tilewidth
 
-
+                    console.log(ts.img.src)
                     temp.style.backgroundImage = `url(${ts.img.src})`;
                     temp.style.backgroundSize = ts.img.width * this.scale + "px " + ts.img.height * this.scale +"px"
                      
-                    let backgroundPosX = "-" + String(((tm[i][j] - ts.min) % this.col) * tilesize.width) + 'px '
-                    let backgroundPosY = "-" + String(Math.floor((tm[i][j] - ts.min) / this.row) * tilesize.height) + 'px'
-                    //  console.log(backgroundPosX, backgroundPosY)
+                    let backgroundPosX = "-" + String(((tm[i][j] - ts.min) %    col) * tilesize.width) + 'px '
+                    let backgroundPosY = "-" + String(Math.floor((tm[i][j] - ts.min) / row) * tilesize.height) + 'px'
+                    console.log(tm[i][j], ts.min, this.col, this.row)
+                    console.log(((tm[i][j] - ts.min) % this.col) * tilesize.width, (Math.floor((tm[i][j] - ts.min) / this.row) * tilesize.height))
                     //console.log("map x:", (this.map[i][j] % this.col), "map y:",Math.floor(this.map[i][j] / this.row ), this.map[i][j])
     
                     temp.style.backgroundPosition = backgroundPosX + backgroundPosY;
@@ -421,10 +424,15 @@ function importMapFromJson(json) {
         for(let i = 0; i < map_arr.length; i ++) {
             let current_layer = []
             for(let j = 0; j < map_arr[i].height; j ++) {
+                console.log("row: ", j)
                 let current_row = []
                 for(let l = 0; l < map_arr[i].width; l ++) {
-                    current_row.push(map_arr[i].data[j * 20 + l])
+                    //console.log("col :", )
+                    console.log()
+                    current_row.push(map_arr[i].data[j * map_arr[i].width + l])
+                    console.log(j * map_arr[i].width + l, map_arr[i].data[j * map_arr[i].width + l])
                 }
+                console.log(current_row)
                 current_layer.push(current_row)
             }
             map_splited.push(current_layer)
