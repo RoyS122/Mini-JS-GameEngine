@@ -124,7 +124,7 @@ class GameObject {
 
        this.sprite.image.onload = () => {
         this.sprite.loaded = true;
-        console.log("image loaded")
+        // console.log("image loaded")
         if (this.collision.fit_to_sprite){
             this.collision.x = 0
             this.collision.y = 0
@@ -159,15 +159,15 @@ class GameObject {
                     (y + this.collision.y + this.collision.height > box.y + box.collision.y)
                 )
             }
-            console.log(
-                box.x,
-                this.collision.x, 
-                this.x,  
-                (x + this.collision.x < box.x + box.width),  
-                (x + this.collision.x + this.collision.width > box.x), 
-                (y + this.collision.y < box.y + box.height), 
-                (y + this.collision.y + this.collision.height > box.y + box.y) 
-                )
+            // console.log(
+                // box.x,
+                // this.collision.x, 
+                // this.x,  
+                // (x + this.collision.x < box.x + box.width),  
+                // (x + this.collision.x + this.collision.width > box.x), 
+                // (y + this.collision.y < box.y + box.height), 
+                // (y + this.collision.y + this.collision.height > box.y + box.y) 
+                // )
             return (
                 (x + this.collision.x < box.x + box.width) &&
                     (x + this.collision.x + this.collision.width > box.x) &&
@@ -199,7 +199,7 @@ class Sprite {
         this.loaded = false
         this.image.onload = () => {
             this.loaded = true;
-            console.log("image loaded")
+            // console.log("image loaded")
 
         }
         this.image_step = 0
@@ -271,34 +271,34 @@ class TileMap {
         this.scale = scale;
         this.json_map = map
 
-        this.map_by_layer = []
+        this.map_by_layer = [[]]
        // this.src = src
         //this.col = col
         //this.row = row
         this.images_loaded = 0
         this.images = []
-        console.log(map, "test")
+      //  console.log(map, "test")
         for(let i = 0; i < this.json_map.tilesets.length; i ++) {
-            console.log(i)
+            // console.log(i)
             var temp_img = {img: new Image(), min: this.json_map.tilesets[i].firstgid, max: -1}
-            console.log(temp_img)
+            // console.log(temp_img)
             if(i > 0) {
                 this.images[i - 1].max = temp_img.min - 1;
             }
             
             temp_img.img.src = this.json_map.tilesets[i].img_url
-            console.log(this.json_map.tilesets[i].img_url)
-            console.log(temp_img)
+            // console.log(this.json_map.tilesets[i].img_url)
+            // console.log(temp_img)
             temp_img.img.onload = () => {
-               // console.log(1)
+                console.log(this.images_loaded)
                 this.images_loaded += 1;
-                console.log(this.images_loaded, this.json_map.tilesets.length)
+                // console.log(this.images_loaded, this.json_map.tilesets.length)
                 if (this.images_loaded == this.json_map.tilesets.length) {
                     this.updateMap()
                 }
                 console.log(this.images_loaded)
             }
-            console.log(temp_img)
+            // console.log(temp_img)
             this.images.push(temp_img)
         }
         this.container = document.createElement("div")
@@ -311,8 +311,8 @@ class TileMap {
 
  
     updateMap() {
-        console.log(1, "update")
-        console.log(this.json_map)
+        // console.log(1, "update")
+        // console.log(this.json_map)
         var map_by_layer = importMapFromJson(this.json_map)
         for(let i = 0; i < this.divmap.length; i ++) {
             this.container.removeChild(this.divmap[i])
@@ -332,16 +332,16 @@ class TileMap {
     }
 
     addLayer(tm) {
-        console.log(tm, "map")
+        // console.log(tm, "map")
         var tilesize = {width: this.json_map.tilewidth * this.scale, height: this.json_map.tileheight * this.scale}
-        console.log(tilesize)
+        // console.log(tilesize)
       //  console.log(json_map)
         for(let i = 0; i < tm.length; i ++) {
-            console.log(i)
+            // console.log(i)
             for(let j = 0; j < tm[0].length; j++){
              //   console.log(this.map)
                 if(tm[i][j] != 0) {
-                    console.log(j)
+                    // console.log(j)
                     let temp = document.createElement("div")
                     temp.style.position = "absolute";
                     //    console.log(String(j * (this.img.width / this.col)))
@@ -356,25 +356,25 @@ class TileMap {
                     let ts = this.images[0]
                     for(let id_ts = 0; tile_value > ts.max && ts.max != -1; id_ts ++){
                         ts = this.images[id_ts]
-                        console.log(this.json_map.tilesets[id_ts])
+                        // console.log(this.json_map.tilesets[id_ts])
                     }
-                    console.log(ts)
-                    console.log(tilesize.width)
+                    // console.log(ts)
+                    // console.log(tilesize.width)
 
                     let row = (ts.img.height / this.json_map.tileheight) - 1
                     let col = (ts.img.width / this.json_map.tilewidth )
 
-                    console.log(
-                        col, row, tm[i][j], (tm[i][j] - ts.min) / row, tm[i][j] + 1 - ts.min, ts.min, Math.ceil((tm[i][j]  + 1) - ts.min)
-                    )
+                    // console.log(
+                        // col, row, tm[i][j], (tm[i][j] - ts.min) / row, tm[i][j] + 1 - ts.min, ts.min, Math.ceil((tm[i][j]  + 1) - ts.min)
+                    // )
                     
                     temp.style.backgroundImage = `url(${ts.img.src})`;
                     temp.style.backgroundSize = ts.img.width * this.scale + "px " + ts.img.height * this.scale +"px"
                      
                     let backgroundPosX = "-" + String(((tm[i][j] - ts.min) % col) * tilesize.width) + 'px '
                     let backgroundPosY = "-" + String(Math.floor((tm[i][j] - ts.min) / row) * tilesize.height) + 'px'
-                    console.log(tm[i][j], ts.min, this.col, this.row)
-                    console.log(((tm[i][j] - ts.min) % this.col) * tilesize.width, (Math.floor((tm[i][j] - ts.min) / this.row) * tilesize.height))
+                    // console.log(tm[i][j], ts.min, this.col, this.row)
+                    // console.log(((tm[i][j] - ts.min) % this.col) * tilesize.width, (Math.floor((tm[i][j] - ts.min) / this.row) * tilesize.height))
                     //console.log("map x:", (this.map[i][j] % this.col), "map y:",Math.floor(this.map[i][j] / this.row ), this.map[i][j])
     
                     temp.style.backgroundPosition = backgroundPosX + backgroundPosY;
@@ -410,7 +410,7 @@ async function importJson(path) {
       return response.json(); // Parse la réponse en JSON
     })
     .then(data => {
-      console.log(data);
+    //   console.log(data);
       return data // Ici, vous avez accès à vos données JSON
       // Faites quelque chose avec vos données JSON
     })
@@ -421,7 +421,7 @@ async function importJson(path) {
 }
 async function importMAPJsonFromFile(path) {
     var json = await importJson(path)
-    console.log(json)
+    // console.log(json)
     for(let i = 0; i < json.tilesets.length; i ++) {
         console.log(resolveUrl(path, json.tilesets[i].source))
         
@@ -429,27 +429,27 @@ async function importMAPJsonFromFile(path) {
         json.tilesets[i].img_url = resolveUrl(path, resolveUrl(json.tilesets[i].source, json.tilesets[i].tsj.image))
         
     }
-    console.log(json, "map")
+    // console.log(json, "map")
     return json
 }
 
 function importMapFromJson(json) {
         
         let map_arr = json.layers.map(layer => layer);
-        console.log(map_arr);
+        // console.log(map_arr);
         let map_splited = []
         for(let i = 0; i < map_arr.length; i ++) {
             let current_layer = []
             for(let j = 0; j < map_arr[i].height; j ++) {
-                console.log("row: ", j)
+                // console.log("row: ", j)
                 let current_row = []
                 for(let l = 0; l < map_arr[i].width; l ++) {
                     //console.log("col :", )
-                    console.log()
+                    // console.log()
                     current_row.push(map_arr[i].data[j * map_arr[i].width + l])
-                    console.log(j * map_arr[i].width + l, map_arr[i].data[j * map_arr[i].width + l])
+                    // console.log(j * map_arr[i].width + l, map_arr[i].data[j * map_arr[i].width + l])
                 }
-                console.log(current_row)
+                // console.log(current_row)
                 current_layer.push(current_row)
             }
             map_splited.push(current_layer)
