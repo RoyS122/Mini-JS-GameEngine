@@ -150,11 +150,12 @@ class GameObject {
 
     collideWith(box,x,y) {
             if (box instanceof GameObject) {
+                console.log(this.sprite.scale, "scale of player")
                 return (
-                    (x + this.collision.x < box.x + box.collision.width) &&
-                    (x + this.collision.x + this.collision.width > box.x + box.collision.x) &&
+                    (x + this.collision.x - this.sprite.getSize().width < box.x + box.collision.width) &&
+                    (x + this.collision.x + (this.collision.width * this.sprite.scale) > box.x + box.collision.x) &&
                     (y + this.collision.y < box.y + box.collision.height) &&
-                    (y + this.collision.y + this.collision.height > box.y + box.collision.y)
+                    (y + this.collision.y + (this.collision.height * this.sprite.scale) > box.y + box.collision.y)
                 )
             }
             // console.log(
@@ -166,11 +167,12 @@ class GameObject {
                 // (y + this.collision.y < box.y + box.height), 
                 // (y + this.collision.y + this.collision.height > box.y + box.y) 
                 // )
+                console.log(x + this.collision.x, box.x + box.width)
             return (
-                (x + this.collision.x < box.x + box.width) &&
-                    (x + this.collision.x + this.collision.width > box.x) &&
+                (x + this.collision.x - this.sprite.getSize().width< box.x + box.width) &&
+                    (x + this.collision.x + (this.collision.width * this.sprite.scale) > box.x) &&
                     (y + this.collision.y < box.y + box.height) &&
-                    (y + this.collision.y + this.collision.height > box.y)
+                    (y + this.collision.y + (this.collision.height * this.sprite.scale) > box.y)
             )
     }
 
