@@ -54,8 +54,6 @@ class Game {
 
         if (room == undefined) {
             var id = this.tilemaps.push(tm) - 1
-
-            this.window
             this.window.appendChild(this.tilemaps[id].container)
         }else{
             var id = this.Rooms[room].gameObjects.push(go) - 1
@@ -271,7 +269,9 @@ class TileMap {
         this.scale = scale;
         this.json_map = map
 
-        this.map_by_layer = [[]]
+        this.onMapLoad = () => {}
+        this.map_by_layer = [[[]]]
+        this.map_loaded = false
        // this.src = src
         //this.col = col
         //this.row = row
@@ -329,6 +329,8 @@ class TileMap {
             this.addLayer(map_by_layer[m])
         }
         this.map_by_layer = map_by_layer
+        this.map_loaded = true
+        this.onMapLoad()
     }
 
     addLayer(tm) {
