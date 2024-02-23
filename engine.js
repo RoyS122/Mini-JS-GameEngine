@@ -159,11 +159,20 @@ class GameObject {
                     (y + this.collision.y + this.collision.height > box.y + box.collision.y)
                 )
             }
+            console.log(
+                box.x,
+                this.collision.x, 
+                this.x,  
+                (x + this.collision.x < box.x + box.width),  
+                (x + this.collision.x + this.collision.width > box.x), 
+                (y + this.collision.y < box.y + box.height), 
+                (y + this.collision.y + this.collision.height > box.y + box.y) 
+                )
             return (
                 (x + this.collision.x < box.x + box.width) &&
-                    (x + this.collision.x + this.collision.width > box.x + box.x) &&
+                    (x + this.collision.x + this.collision.width > box.x) &&
                     (y + this.collision.y < box.y + box.height) &&
-                    (y + this.collision.y + this.collision.height > box.y + box.y)
+                    (y + this.collision.y + this.collision.height > box.y)
             )
     }
 
@@ -216,9 +225,6 @@ class Sprite {
 
         this.container.style.width = size.width + "px"
         this.container.style.height = size.height +"px"
-
-
-
 
         this.container.style.backgroundImage = `url(${this.image.src})`;
 
