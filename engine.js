@@ -325,9 +325,10 @@ class TileMap {
         this.divmap = []
         
         for(let m = 0; m < map_by_layer.length; m ++) {
+        
             this.addLayer(map_by_layer[m])
         }
-        this.map_by_layer = map_by_layer[0]
+        this.map_by_layer = map_by_layer
     }
 
     addLayer(tm) {
