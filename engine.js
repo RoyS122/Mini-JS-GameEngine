@@ -271,7 +271,7 @@ class TileMap {
         this.scale = scale;
         this.json_map = map
 
-     
+        this.map_by_layer = [[]]
        // this.src = src
         //this.col = col
         //this.row = row
@@ -327,6 +327,7 @@ class TileMap {
         for(let m = 0; m < map_by_layer.length; m ++) {
             this.addLayer(map_by_layer[m])
         }
+        this.map_by_layer = map_by_layer[0]
     }
 
     addLayer(tm) {
