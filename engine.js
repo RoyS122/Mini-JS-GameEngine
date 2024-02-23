@@ -6,6 +6,7 @@ class Game {
 
         document.body.appendChild(this.window)
         this.window.setAttribute("class", "game_window")
+        this.window.style.position = "fixed";
         this.GameObjects = []
         this.Rooms =  []
         this.tilemaps = []
@@ -275,7 +276,7 @@ class TileMap {
             console.log(i)
             var temp_img = {img: new Image(), min: this.json_map.tilesets[i].firstgid, max: -1}
             console.log(temp_img)
-            if(i != 0 ) {
+            if(i > 0) {
                 this.images[i - 1].max = temp_img.min - 1;
             }
             
@@ -296,7 +297,9 @@ class TileMap {
         }
         this.container = document.createElement("div")
         //this.container.id = name
+        this.container.style.position = "absolute";
         this.container.style.zIndex = z
+       
         this.divmap = []
     }
 
@@ -339,22 +342,28 @@ class TileMap {
                     temp.style.top = String(i * tilesize.height) + "px"
 
                  //   console.log(`url(${this.img.src})`)   
-                    var tile_value = tm[i][j]
+                    var tile_value = tm[i][j] 
+                    
                     
                     let ts = this.images[0]
                     for(let id_ts = 0; tile_value > ts.max && ts.max != -1; id_ts ++){
                         ts = this.images[id_ts]
+                        console.log(this.json_map.tilesets[id_ts])
                     }
                     console.log(ts)
+                    console.log(tilesize.width)
 
-                    let row = ts.img.height / this.json_map.tileheight
-                    let col = ts.img.width / this.json_map.tilewidth
+                    let row = (ts.img.height / this.json_map.tileheight) - 1
+                    let col = (ts.img.width / this.json_map.tilewidth )
 
-                    console.log(ts.img.src)
+                    console.log(
+                        col, row, tm[i][j], (tm[i][j] - ts.min) / row, tm[i][j] + 1 - ts.min, ts.min, Math.ceil((tm[i][j]  + 1) - ts.min)
+                    )
+                    
                     temp.style.backgroundImage = `url(${ts.img.src})`;
                     temp.style.backgroundSize = ts.img.width * this.scale + "px " + ts.img.height * this.scale +"px"
                      
-                    let backgroundPosX = "-" + String(((tm[i][j] - ts.min) %    col) * tilesize.width) + 'px '
+                    let backgroundPosX = "-" + String(((tm[i][j] - ts.min) % col) * tilesize.width) + 'px '
                     let backgroundPosY = "-" + String(Math.floor((tm[i][j] - ts.min) / row) * tilesize.height) + 'px'
                     console.log(tm[i][j], ts.min, this.col, this.row)
                     console.log(((tm[i][j] - ts.min) % this.col) * tilesize.width, (Math.floor((tm[i][j] - ts.min) / this.row) * tilesize.height))
