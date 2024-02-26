@@ -158,21 +158,12 @@ class GameObject {
                     (y + this.collision.y + (this.collision.height * this.sprite.scale) > box.y + box.collision.y)
                 )
             }
-            // console.log(
-                // box.x,
-                // this.collision.x, 
-                // this.x,  
-                // (x + this.collision.x < box.x + box.width),  
-                // (x + this.collision.x + this.collision.width > box.x), 
-                // (y + this.collision.y < box.y + box.height), 
-                // (y + this.collision.y + this.collision.height > box.y + box.y) 
-                // )
-                console.log(x + this.collision.x, box.x + box.width)
+            
             return (
-                (x + this.collision.x - this.sprite.getSize().width< box.x + box.width) &&
-                    (x + this.collision.x + (this.collision.width * this.sprite.scale) > box.x) &&
-                    (y + this.collision.y < box.y + box.height) &&
-                    (y + this.collision.y + (this.collision.height * this.sprite.scale) > box.y)
+                    (x + (this.collision.x - (this.collision.width / 2)) * this.sprite.scale  < box.x + box.width) &&
+                    (x + this.collision.x * this.sprite.scale + (this.collision.width * this.sprite.scale) > box.x) &&
+                    (y + this.collision.y * this.sprite.scale  < box.y + box.height) &&
+                    (y + (this.collision.y + this.collision.height) * this.sprite.scale > box.y)
             )
     }
 
