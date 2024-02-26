@@ -356,8 +356,9 @@ class TileMap {
                     // console.log(ts)
                     // console.log(tilesize.width)
 
-                    let row = (ts.img.height / this.json_map.tileheight) - 1
+                    let row = (ts.img.height / this.json_map.tileheight)
                     let col = (ts.img.width / this.json_map.tilewidth )
+                    
 
                     // console.log(
                         // col, row, tm[i][j], (tm[i][j] - ts.min) / row, tm[i][j] + 1 - ts.min, ts.min, Math.ceil((tm[i][j]  + 1) - ts.min)
@@ -365,9 +366,11 @@ class TileMap {
                     
                     temp.style.backgroundImage = `url(${ts.img.src})`;
                     temp.style.backgroundSize = ts.img.width * this.scale + "px " + ts.img.height * this.scale +"px"
-                     
+                    if  (tile_value == 93) {
+                        console.log((tm[i][j] - ts.min) / row, "row perfect", ts.min, row, tm[i][j], col )
+                    } 
                     let backgroundPosX = "-" + String(((tm[i][j] - ts.min) % col) * tilesize.width) + 'px '
-                    let backgroundPosY = "-" + String(Math.floor((tm[i][j] - ts.min) / row) * tilesize.height) + 'px'
+                    let backgroundPosY = "-" + String(Math.floor((tm[i][j] - ts.min) / col) * tilesize.height) + 'px';
                     // console.log(tm[i][j], ts.min, this.col, this.row)
                     // console.log(((tm[i][j] - ts.min) % this.col) * tilesize.width, (Math.floor((tm[i][j] - ts.min) / this.row) * tilesize.height))
                     //console.log("map x:", (this.map[i][j] % this.col), "map y:",Math.floor(this.map[i][j] / this.row ), this.map[i][j])
