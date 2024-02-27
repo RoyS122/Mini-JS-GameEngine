@@ -1,12 +1,18 @@
 
 class Game {
-    constructor() {
-
+    constructor(cameraWidth = 720, cameraHeight = 500) {
+        
         this.window = document.createElement("div")
-
+        this.cameraWidth = cameraWidth
+        this.cameraHeight = cameraHeight
         document.body.appendChild(this.window)
         this.window.setAttribute("class", "game_window")
-        this.window.style.position = "fixed";
+        this.window.style.maxWidth = cameraWidth + "px"
+        this.window.style.maxHeight = cameraHeight + "px"
+        this.window.style.width = cameraWidth + "px"
+        this.window.style.height = cameraHeight + "px"
+        this.window.style.position = "absolute";
+        this.window.style.overflow = "hidden";
         this.GameObjects = []
         this.Rooms =  []
         this.tilemaps = []
@@ -135,6 +141,7 @@ class GameObject {
     }
 
     draw() {
+        console.log(this.y, this.x)
         this.sprite.x = this.x
         this.sprite.y = this.y
         this.sprite.draw()
@@ -180,6 +187,8 @@ class Sprite {
         this.row = 1
         this.col = 1
         this.speed = 0
+        this.x = 0
+        this.y = 0
         this.container = document.createElement("div")
         this.container.setAttribute("class", "game_object")
         this.container.style.position = 'absolute';
@@ -199,13 +208,14 @@ class Sprite {
 
     }
 
-    draw() { // to be executed in the gamedraw loop, (with a constant tickrate)
+    draw(x, y) { // to be executed in the gamedraw loop, (with a constant tickrate)
         let delay_target = Math.floor(60 / this.speed)
 
         let size = this.getSize()
-        //console.log(this.x)
-        this.container.style.left = this.x + "px"
-        this.container.style.top = this.y + "px"
+        console.log(this.y, this.x)
+        this.container.style.transform = `translate( ${x}px, ${y}px )`;
+       //  this.container.style.left = this.x + "px"
+       //  this.container.style.top = this.y + "px"
         this.container.style.zIndex = this.z
 
         let w_scaled = this.image.width * this.scale
@@ -296,6 +306,7 @@ class TileMap {
         }
         this.container = document.createElement("div")
         //this.container.id = name
+        
         this.container.style.position = "absolute";
         this.container.style.zIndex = z
        
@@ -376,14 +387,18 @@ class TileMap {
                     //console.log("map x:", (this.map[i][j] % this.col), "map y:",Math.floor(this.map[i][j] / this.row ), this.map[i][j])
     
                     temp.style.backgroundPosition = backgroundPosX + backgroundPosY;
-            
                     temp.style.width = String(tilesize.width) +"px"
                     temp.style.height = String(tilesize.height) + "px"
                     this.divmap.push(temp)
                     this.container.appendChild(temp)
                 }
+                
             }
+            
         }
+        this.container.style.width = tm[0].length * this.scale * this.json_map.tilewidth + "px"
+        this.container.style.height = tm.length * this.scale * this.json_map.tileheight + "px"
+       
     }
 }
 
