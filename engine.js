@@ -396,6 +396,7 @@ class TileMap {
             }
             
         }
+        
         this.container.style.width = tm[0].length * this.scale * this.json_map.tilewidth + "px"
         this.container.style.height = tm.length * this.scale * this.json_map.tileheight + "px"
        
@@ -448,7 +449,8 @@ async function importMAPJsonFromFile(path) {
 
 function importMapFromJson(json) {
         
-        let map_arr = json.layers.map(layer => layer);
+        let map_arr = json.layers.filter(layer => layer.type=="tilelayer");
+        
         // console.log(map_arr);
         let map_splited = []
         for(let i = 0; i < map_arr.length; i ++) {
