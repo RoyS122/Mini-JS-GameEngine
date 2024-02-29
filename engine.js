@@ -1,8 +1,8 @@
 
 class Game {
-    constructor(cameraWidth = 720, cameraHeight = 500) {
+    constructor(cameraWidth = 720, cameraHeight = 500, fps_target=60) {
         this.lastFrameTime = 0
-        this.targetFPS = 60
+        this.targetFPS = fps_target
         this.targetDeltaTime = 1000 / this.targetFPS
         this.window = document.createElement("div")
         this.cameraWidth = cameraWidth
