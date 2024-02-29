@@ -1,7 +1,9 @@
 
 class Game {
     constructor(cameraWidth = 720, cameraHeight = 500) {
-        
+        this.lastFrameTime = 0
+        this.targetFPS = 60
+        this.targetDeltaTime = 1000 / this.targetFPS
         this.window = document.createElement("div")
         this.cameraWidth = cameraWidth
         this.cameraHeight = cameraHeight
@@ -69,6 +71,13 @@ class Game {
     }
 
     gameLoop() {
+        window.requestAnimationFrame(() => this.gameLoop())
+        const deltaTime = this.timestamp - this.lastFrameTime;
+        if (deltaTime < this.targetDeltaTime) {
+            console.log("time")
+            // Trop tôt pour la prochaine mise à jour selon le cap des FPS.
+            return;
+        }
 
         for(let i = 0; i < this.GameObjects.length; i ++) { // running through the list of objects they are not in a specific room
             // Draw
@@ -77,7 +86,11 @@ class Game {
             this.GameObjects[i].onStep()
             // On kill event
             if(this.GameObjects[i].kill == true) {
+
                 this.GameObjects[i].onKill()
+                this.GameObjects[i].sprite.container.remove()   
+                deleteFromArray(this.GameObjects, i)
+
             }
         }
 
@@ -96,8 +109,8 @@ class Game {
             }
         }
 
-
-        window.requestAnimationFrame(() => this.gameLoop())
+        this.lastFrameTime = this.timestamp - (deltaTime % this.targetDeltaTime);
+        
     }
     keyboardCheck(key) {
         return this.inputs[key]
@@ -142,9 +155,7 @@ class GameObject {
 
     draw() {
         console.log(this.y, this.x)
-        this.sprite.x = this.x
-        this.sprite.y = this.y
-        this.sprite.draw()
+        this.sprite.draw(this.x, this.y)
     }
 
     onStep() {
@@ -155,14 +166,18 @@ class GameObject {
 
     }
 
+    onKill() {
+
+    }
+
     collideWith(box,x,y) {
             if (box instanceof GameObject) {
-                console.log(this.sprite.scale, "scale of player")
+                
                 return (
-                    (x + this.collision.x - this.sprite.getSize().width < box.x + box.collision.width) &&
-                    (x + this.collision.x + (this.collision.width * this.sprite.scale) > box.x + box.collision.x) &&
-                    (y + this.collision.y < box.y + box.collision.height) &&
-                    (y + this.collision.y + (this.collision.height * this.sprite.scale) > box.y + box.collision.y)
+                    (x + (this.collision.x - (this.collision.width / 2)) * this.sprite.scale  < box.x + (box.collision.x + box.collision.width) * box.sprite.scale) &&
+                    (x + this.collision.x * this.sprite.scale + (this.collision.width * this.sprite.scale) > box.x + box.collision.x) &&
+                    (y + this.collision.y * this.sprite.scale  < box.y + (box.collision.y + box.collision.height) * box.sprite.scale) &&
+                    (y + (this.collision.y + this.collision.height) * this.sprite.scale > box.y + box.collision.y)
                 )
             }
             
@@ -229,7 +244,7 @@ class Sprite {
 
         this.container.style.backgroundImage = `url(${this.image.src})`;
 
-        this.container.style.backgroundPosition = String(this.image_step % this.col * size.width) + 'px ' + String(Math.floor(this.image_step / this.row) * size.height) + 'px';
+        this.container.style.backgroundPosition = "-" +String(this.image_step % this.col * size.width) + 'px ' + "-" +String(Math.floor(this.image_step / this.row) * size.height) + 'px';
 
         this.delay += 1
         if (delay_target == this.delay) {
@@ -429,6 +444,7 @@ async function importJson(path) {
       // Faites quelque chose avec vos données JSON
     })
     .catch(error => {
+        console.log(path)
       console.error('There has been a problem with your fetch operation:', error);
     });
 
@@ -449,7 +465,7 @@ async function importMAPJsonFromFile(path) {
 
 function importMapFromJson(json) {
         
-        let map_arr = json.layers.filter(layer => layer.type=="tilelayer");
+        let map_arr = json.layers.filter((layer) => {return layer.type=="tilelayer"});
         
         // console.log(map_arr);
         let map_splited = []
@@ -491,5 +507,19 @@ function resolveUrl(base, relative) {
     return stack.join("/");
 }
 
+function deleteFromArray(array, id) {
+    if(id >= 0 && id < array.length) {
+        array.splice(id, 1);
+    }
+}
 
-export {Game, GameObject, CollideBox, Sprite, TileMap, importJson, importMAPJsonFromFile}
+function checkColl(obj, to_check, x, y) {
+    for(let i = 0; i < to_check.length; i ++) {
+        if (obj.collideWith(to_check[i], x, y)) {
+            return true
+        }
+    }
+    return false 
+}
+
+export {Game, GameObject, CollideBox, Sprite, TileMap,checkColl , importJson, importMAPJsonFromFile}
