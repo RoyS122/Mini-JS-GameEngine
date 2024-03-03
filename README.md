@@ -20,6 +20,9 @@ Cette methode ajoute le tilemap en question à l'instance de jeu.
 
 - `keyboardCheck(key)` : **"key"** doit être une keyvalue en javascript (pour plus d'information voir la liste [ici](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values)) 
 Cette methode permet de verifier si une touche est appuyée et retourne un booléen.
+##### Attributs
+- cameraHeight :  
+- fps_target : limite de fps appliqué (surtout utile pour les ecran de plus)
 
 #### Room 
 WIP
