@@ -1,6 +1,8 @@
 
 class Game {
     constructor(cameraWidth = 720, cameraHeight = 500, fps_target = 60) {
+		this.cameraY = 0
+		this.cameraX = 0
         this.lastFrameTime = 0
         this.minDeltatime = 1000
         this.targetFPS = fps_target
@@ -17,62 +19,89 @@ class Game {
         this.window.style.position = "absolute";
         this.window.style.overflow = "hidden";
         this.GameObjects = []
+		this.menus = []
         this.Rooms =  []
         this.tilemaps = []
-        this.currentmap = 0
+		this.objAreInKilling = 0
+		this.inputs_buffer = {}
+		this.lastFrameTime = 0;
+		this.frameCount = 0;
+		this.fps = 0;
+		this.lastSecond = 0;
+		this.lastSecond = 0;
+	//	this.object_kill_count = 0
+		this.currentMenu = undefined
+		this.currentmap = 0
         this.CurrentRoom = 0
-
+		this.framerateBuffer = []
         this.inputs = {};
         this.mouse = {x: 0, y: 0}
-
         document.addEventListener('keydown', (e) => {
-            this.inputs[e.key] = true;
+			this.inputs_buffer[e.key] = !this.inputs[e.key];
+    		this.inputs[e.key] = true;
         }, false);
         document.addEventListener('keyup', (e) => {
-            this.inputs[e.key] = false;
+			this.inputs[e.key] = false;
+			this.inputs_buffer[e.key] = false;
+            
         }, false);
         document.addEventListener('mousemove', (e) => {
             this.mouse.x = e.x;
             this.mouse.y = e.y;
         })
         document.addEventListener('mouseevent', (e) => {
-
         })
-
     }
-
-    startGameLoop() {
+	checkAllKillsReady() {
+		
+		for(let i = 0; i < this.GameObjects.length; i ++) {
+			if (this.GameObjects[i].kill == true) {
+				return false
+			}
+		}
+		return true
+	}
+	startGameLoop() {
         this.lastFrameTime = 1
         window.requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
     }
-
     addObject(go, room=undefined) {
-
         if (room == undefined) {
-            var id = this.GameObjects.push(go) - 1
-
-            this.GameObjects[id].onCreate()
-            this.window.appendChild(this.GameObjects[id].sprite.container)
+            
+			var id = this.GameObjects.push(go) - 1
+            if(this.GameObjects[id].onCreate !== undefined) {
+				this.GameObjects[id].onCreate()
+			}
+			
+			if(this.GameObjects[id].sprite.container !== undefined) {
+			
+				this.window.appendChild(this.GameObjects[id].sprite.container)
+			}
         }else{
             var id = this.Rooms[room].gameObjects.push(go) - 1
             this.Rooms[room].gameObjects[id].onCreate()
             this.window.appendChild(this.Rooms[room].gameObjects[id].container)
         }
-
-
     }
     nextMap() {
         if(this.currentmap !== undefined) {
-            this.tilemaps[this.currentmap].container.remove()
+			this.window.removeChild(this.tilemaps[this.currentmap].container)
             this.currentmap += 1;
             this.window.appendChild(this.tilemaps[this.currentmap].container)
         }
     }
-    addTileMap(tm, room=undefined){
-
+	
+	changeMap(id) {
+		if(this.currentmap !== undefined) {
+            this.window.removeChild(this.tilemaps[this.currentmap].container)
+            this.currentmap = id;
+            this.window.appendChild(this.tilemaps[id].container)
+        }
+	}
+	addTileMap(tm, room=undefined){
         if (room == undefined) {
             var id = this.tilemaps.push(tm) - 1
-            console.log(tm)
+         
             if(id == 0) {
                 this.currentmap = 0
                 this.window.appendChild(this.tilemaps[id].container)
@@ -85,41 +114,82 @@ class Game {
             this.window.appendChild(this.Rooms[room].gameObjects[id].container)
         }
     }
-
-    gameLoop(timestamp) {
+	addMenu(menu) {
+		this.menus.push(menu)
+	}
+	
+	showMenu(menu) {
+		//let n = menu.container.cloneNode(true)
+		this.currentMenu = document.body.appendChild(menu.container)
+		this.pause = menu.pauseRequired
+	}
+	exitMenu() {
+		this.currentMenu.remove()
+		this.currentMenu = false
+		this.pause = false
+	}
+	gameLoop(timestamp) {
       
         window.requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
         
         let deltaTime = timestamp - this.lastFrameTime;
         
-    //  console.log(deltaTime, this.targetDeltaTime, timestamp, this.lastFrameTime)
-        // console.log(deltaTime + this.minDeltatime)
+ 
         if (deltaTime < this.targetDeltaTime) {
-            // console.log("time")
             // Trop tôt pour la prochaine mise à jour selon le cap des FPS.
+			this.buffer_key = this.inputs;
             return;
         }
-
-        for(let i = 0; i < this.GameObjects.length; i ++) { // running through the list of objects they are not in a specific room
-            // Draw
-            this.GameObjects[i].draw()
-            // Step Events
-            this.GameObjects[i].onStep()
-            // On kill event
-            if(this.GameObjects[i].kill == true) {
-
-                this.GameObjects[i].onKill()
-                this.GameObjects[i].sprite.container.remove()   
-                deleteFromArray(this.GameObjects, i)
-
+		
+		if (timestamp - this.lastSecond >= 1000) {
+        // Mise à jour du FPS (nombre de frames dans la dernière seconde)
+        this.fps = this.frameCount;
+        // Réinitialisation du compteur de frames
+        this.frameCount = 0;
+        // Mise à jour du dernier moment où les FPS ont été calculés
+        this.lastSecond = timestamp;
+		}
+		this.frameCount++;
+		
+	this.menus.forEach((menu) => {
+        // Vérifier si la touche a été pressée une seule fois
+        if (this.inputs_buffer[menu.key]) {
+            if (!this.currentMenu  ) {
+                this.showMenu(menu);
+				
+            } else {
+                this.exitMenu();
             }
+			this.inputs_buffer[menu.key] = false
         }
+    });
+		 
+		
+		
+		if (!this.pause) {
+		
+		
+		for(let i = 0; i < this.GameObjects.length; i ++) { // running through the list of objects they are not in a specific room
+            // Draw
 
+			if (this.GameObjects[i].fitToCameraOptimisation == true) {
+				if(this.checkInScreen(this.GameObjects[i])) {
+					this.GameObjects[i].draw()
+            		// Step Events
+            		this.GameObjects[i].onStep()
+				}
+			}else{
+				this.GameObjects[i].draw()
+            		// Step Events
+            	this.GameObjects[i].onStep()
+			}
+			
+           
+        }
         if(this.Rooms.length) { // if the list of room is empty skip the running through of room's objects
             for(let i = 0; i < this.Rooms[this.CurrentRoom].gameObjects; i ++) {
                 // Draw Events
                 this.Rooms[this.CurrentRoom].gameObjects[i].sprite.draw()
-
                 // Step Events
                 this.Rooms[this.CurrentRoom].gameObjects[i].onStep()
                 
@@ -128,70 +198,102 @@ class Game {
                 }
             }
         }
-
+		
+		}
+	for (let i = this.GameObjects.length - 1; i >= 0; i--) {
+    	if (this.GameObjects[i].kill == true) {
+			this.GameObjects[i].onKill();
+			
+			if (this.GameObjects[i] instanceof TextObject) {
+				console.log(this.GameObjects[i])
+				this.GameObjects[i].container.remove();
+			}else{
+				this.GameObjects[i].sprite.container.remove();
+			}
+			
+        	
+			this.objAreInKilling -= 1
+			this.GameObjects[i].kill == false;
+        	deleteFromArray(this.GameObjects, i)// Utiliser splice directement pour supprimer l'élément
+    	}
+}
+		
         this.lastFrameTime = timestamp - (deltaTime % this.targetDeltaTime)
-
         
     }
     keyboardCheck(key) {
         return this.inputs[key]
     }
+	killObject(obj) {
+		obj.kill = true
+		this.objAreInKilling += 1
+	}
+	checkInScreen(gO) {		
 
 
+		return (gO.x + gO.sprite.getSize().width * gO.sprite.scale + 10 > this.cameraX && gO.x - gO.sprite.getSize().width / 2 < this.cameraX + this.cameraWidth )
+	}
+	
 }
-
 class Room {
     constructor(id) {
         this.id = id
         this.gameObjects = []
     }
-
     addObject(go) {
         var id = this.gameObjects.push(go)
         this.gameObjects[id].onCreate()
     }
  }
-
 class GameObject {
     constructor(name = "") {
-       this.x = 0
-       this.y = 0
-       this.sprite = new Sprite(name)
-
+		this.fitToCameraOptimisation = false
+		this.x = 0
+		this.y = 0
+		this.sprite = new Sprite(name)
        this.collision = new CollideBox(0, 0, 0, 0)
-
        this.sprite.image.onload = () => {
         this.sprite.loaded = true;
-        // console.log("image loaded")
-        if (this.collision.fit_to_sprite){
+        this.updateCollisions()        
+    }
+    this.kill = false
+    }
+	
+	clone() {
+		let clone = new GameObject(this.name)
+		clone.fitToCameraOptimisation = this.fitToCameraOptimisation
+		clone.x = this.x
+		clone.y = this.y
+		clone.collision = this.collision.clone()
+		clone.draw = this.draw
+		clone.onStep = this.onStep
+		clone.onCreate = this.onCreate
+		clone.updateCollisions = this.updateCollisions
+		clone.onKill = this.onKill
+		clone.sprite = this.sprite.clone()
+		
+		return clone 
+	}
+	
+    draw() {
+        
+        this.sprite.draw(this.x, this.y)
+    }
+    onStep() {
+    }
+    onCreate() {
+    }
+    onKill() {
+    }
+	updateCollisions() {
+		if (this.collision.fit_to_sprite){
             this.collision.x = 0
             this.collision.y = 0
             this.collision.width = this.sprite.getSize().width
             this.collision.height = this.sprite.getSize().height
         }
-        
-    }
-    this.kill = false
-
-    }
-
-    draw() {
-        console.log(this.y, this.x)
-        this.sprite.draw(this.x, this.y)
-    }
-
-    onStep() {
-
-    }
-
-    onCreate() {
-
-    }
-
-    onKill() {
-
-    }
-
+	}
+	
     collideWith(box,x,y) {
             if (box instanceof GameObject) {
                                 
@@ -210,13 +312,9 @@ class GameObject {
                     (y + (this.collision.y + this.collision.height) * this.sprite.scale > box.y)
             )
     }
-
-
    // addSprite(sprite) {
-
     //}
 }
-
 class Sprite {
     constructor(name, z) {
       //  this.parent = parent
@@ -234,65 +332,85 @@ class Sprite {
         this.image = new Image()
         this.container.style.backgroundImage = "" + this.image + ""
         this.loaded = false
-        this.image.onload = () => {
-            this.loaded = true;
-            // console.log("image loaded")
-
-        }
+    //    this.image.onload = () => {
+      //      this.loaded = true;
+        
+        //}
         this.image_step = 0
         this.delay = 0
         this.z = z
-
     }
+	
+	clone() {
+		let clone = new Sprite(this.name)
+		clone.scale = this.scale 
+		clone.row = this.row
+		clone.col = this.col
+		clone.speed = this.speed
+		clone.image_step = this.image_step
+		
+		clone.x = this.x
+		clone.y = this.y 
+		clone.container = document.createElement("div")
+        clone.container.setAttribute("class", "game_object")
+        clone.container.style.position = 'absolute';
+        clone.container.style.imageRendering = "pixelated"
+       	clone.container.setAttribute("id", this.name)
+        clone.image = this.image.cloneNode(true)
+		
 
+     //   clone.container.style.backgroundImage = "" + clone.image + ""
+        clone.loaded = false
+       // clone.image.onload =
+	
+        //    clone.loaded = true;
+  //           console.log("image loaded")
+        //}
+     
+        clone.delay = 0
+  
+		clone.z = this.z
+		return clone
+	}
+	
     draw(x, y) { // to be executed in the gamedraw loop, (with a constant tickrate)
         let delay_target = Math.floor(60 / this.speed)
-
+	//	console.log(this.image_step, this.speed)
         let size = this.getSize()
         // console.log(this.y, this.x)
         this.container.style.transform = `translate( ${x}px, ${y}px )`;
        //  this.container.style.left = this.x + "px"
        //  this.container.style.top = this.y + "px"
         this.container.style.zIndex = this.z
-
         let w_scaled = this.image.width * this.scale
         let h_scaled = this.image.height * this.scale
         size.width = size.width * this.scale
         size.height = size.height * this.scale
         this.container.style.backgroundSize = w_scaled + "px " + h_scaled +"px"
-
         this.container.style.width = size.width + "px"
         this.container.style.height = size.height +"px"
-
         this.container.style.backgroundImage = `url(${this.image.src})`;
-
-        this.container.style.backgroundPosition = "-" +String(this.image_step % this.col * size.width) + 'px ' + "-" +String(Math.floor(this.image_step / this.col) * size.height) + 'px';
-
+        this.container.style.backgroundPosition = "-" + String(this.image_step % this.col * size.width) + 'px ' + "-" +String(Math.floor(this.image_step / this.col) * size.height) + 'px';
         this.delay += 1
         if (delay_target == this.delay) {
             this.delay = 0
             this.image_step = (this.image_step + 1) % (this.col * this.row)
         //    console.log(this.container.style.backgroundPosition)
         }
-
     }
-
     setAnimation(col = 1, row = 1, speed = 0) {
         this.col = col;
         this.row = row;
         this.speed = speed;
     }
-
     setImage(path) {
         this.loaded = false
         this.image.src = path
     }
-
     getSize() {
        return {width: this.image.width / this.col, height: this.image.height / this.row}
     }
 }
-
 class CollideBox {
     constructor(x=0, y=0, w=0, h=0, fts=true) {
         this.x = x
@@ -301,14 +419,15 @@ class CollideBox {
         this.height = h
         this.fit_to_sprite = fts
     }
-
+	clone() {
+		let clone = new CollideBox(this.x, this.y, this.width, this.height, this.fit_to_sprite)
+		return clone
+	}
 }
-
 class TileMap {
     constructor(map, z = 0, scale = 1){
         this.scale = scale;
         this.json_map = map
-
         this.onMapLoad = () => {}
         this.map_by_layer = [[[]]]
         this.map_loaded = false
@@ -336,7 +455,7 @@ class TileMap {
                 if (this.images_loaded == this.json_map.tilesets.length) {
                     this.updateMap()
                 }
-                console.log(this.images_loaded)
+             //   console.log(this.images_loaded)
             }
             // console.log(temp_img)
             this.images.push(temp_img)
@@ -349,7 +468,6 @@ class TileMap {
        
         this.divmap = []
     }
-
  
     updateMap() {
         // console.log(1, "update")
@@ -359,10 +477,7 @@ class TileMap {
             this.container.removeChild(this.divmap[i])
         }
         this.container.style.imageRendering = "pixelated"
-
        // console.log(this.map[0].length)
-
-
         this.divmap = []
         
         for(let m = 0; m < map_by_layer.length; m ++) {
@@ -373,7 +488,6 @@ class TileMap {
         this.map_loaded = true
         this.onMapLoad()
     }
-
     addLayer(tm) {
         // console.log(tm, "map")
         var tilesize = {width: this.json_map.tilewidth * this.scale, height: this.json_map.tileheight * this.scale}
@@ -388,10 +502,8 @@ class TileMap {
                     let temp = document.createElement("div")
                     temp.style.position = "absolute";
                     //    console.log(String(j * (this.img.width / this.col)))
-
                     temp.style.left = String(j * tilesize.width)+ "px"
                     temp.style.top = String(i * tilesize.height) + "px"
-
                  //   console.log(`url(${this.img.src})`)   
                     var tile_value = tm[i][j] 
                     
@@ -403,11 +515,9 @@ class TileMap {
                     }
                     // console.log(ts)
                     // console.log(tilesize.width)
-
                     let row = (ts.img.height / this.json_map.tileheight)
                     let col = (ts.img.width / this.json_map.tilewidth )
                     
-
                     // console.log(
                         // col, row, tm[i][j], (tm[i][j] - ts.min) / row, tm[i][j] + 1 - ts.min, ts.min, Math.ceil((tm[i][j]  + 1) - ts.min)
                     // )
@@ -439,7 +549,6 @@ class TileMap {
        
     }
 }
-
 class TextObject extends GameObject{
     constructor(content = "") {
         super()
@@ -455,18 +564,57 @@ class TextObject extends GameObject{
        // this.container.style.fontFamily = 
     }
 }
-
 // class TileSet {
 //     constructor(name) {
-
 //     }
 // }
-
+//debut menu
 class Menu {
-
+	constructor(w, h, title, pause_require = true, key, z = 15) {
+		this.pauseRequired = pause_require
+		this.key = key
+		this.z = z
+		this.w = w
+		this.h = h;
+		this.title_obj = document.createElement("p")
+		this.title_obj.textContent = title
+		this.title_obj.style.color = "white";
+		this.title_obj.style.opacity = 1;
+		this.title_obj.style.opacity = z + 1;
+		this.title_obj.style.textAlign = "center";
+		this.container = document.createElement("div")
+		this.container.style.width = w + "px";
+		this.container.style.height = h + "px";
+		this.container.style.backgroundColor = "rgba(0, 0, 0, 0.7)"
+		this.container.style.justifyContent = "center"
+		this.container.style.zIndex = z
+		this.container.style.position = "absolute"
+		this.container.appendChild(this.title_obj)
+		this.buttons = []
+	}
+	
+	addButton(title, funct) {
+		let b_id = this.buttons.push(document.createElement("button"));
+		//console.log(b_id)
+		//console.log(this.buttons[b_id - 1])
+		
+		this.buttons[b_id - 1].textContent = title;
+		this.buttons[b_id - 1].style.alignSelf = "center";
+		this.buttons[b_id - 1].style.position = "relative"
+		this.buttons[b_id - 1].style.left	= String(this.w / 4) + "px";
+	//	this.buttons[b_id - 1].style.top = String(this.h / this.buttons.length / 2 * b_id) +"px"  
+		this.buttons[b_id - 1].style.textAlign = "center"
+		//this.buttons[b_id - 1].style. = "center";
+		this.buttons[b_id - 1].onclick = funct;
+		this.buttons[b_id - 1].style.zIndex = this.z + 1
+		this.container.appendChild(this.buttons[b_id - 1])
+		this.container.appendChild(document.createElement("br"))
+		this.container.appendChild(document.createElement("br"))
+		
+	}
+	
 }
-
-
+//endregion
 async function importJson(path) {
     return fetch(path)
     .then(response => {
@@ -485,25 +633,23 @@ async function importJson(path) {
         console.log(path)
       console.error('There has been a problem with your fetch operation:', error);
     });
-
 }
 async function importMAPJsonFromFile(path) {
     var json = await importJson(path)
     // console.log(json)
     for(let i = 0; i < json.tilesets.length; i ++) {
-        console.log(resolveUrl(path, json.tilesets[i].source))
+       // console.log(resolveUrl(path, json.tilesets[i].source))
       
         
         json.tilesets[i].tsj = await importJson(resolveUrl(path, json.tilesets[i].source))
-        console.log(json)
-        console.log(resolveUrl(path, resolveUrl(json.tilesets[i].source, json.tilesets[i].tsj.image)))
+        //console.log(json)
+        //console.log(resolveUrl(path, resolveUrl(json.tilesets[i].source, json.tilesets[i].tsj.image)))
         json.tilesets[i].img_url = resolveUrl(path, resolveUrl(json.tilesets[i].source, json.tilesets[i].tsj.image))
         
     }
     // console.log(json, "map")
     return json
 }
-
 function importMapFromJson(json) {
         
         let map_arr = json.layers.filter((layer) => {return layer.type=="tilelayer"});
@@ -519,20 +665,17 @@ function importMapFromJson(json) {
                     //console.log("col :", )
                     // console.log()
                     current_row.push(map_arr[i].data[j * map_arr[i].width + l])
-                    // console.log(j * map_arr[i].width + l, map_arr[i].data[j * map_arr[i].width + l])
+                    // //(j * map_arr[i].width + l, map_arr[i].data[j * map_arr[i].width + l])
                 }
-                // console.log(current_row)
                 current_layer.push(current_row)
             }
             map_splited.push(current_layer)
             
-
         }
         
         return map_splited;
     
 }
-
 function resolveUrl(base, relative) {
     var stack = base.split("/"),
         parts = relative.split("/");
@@ -547,13 +690,11 @@ function resolveUrl(base, relative) {
     }
     return stack.join("/");
 }
-
 function deleteFromArray(array, id) {
     if(id >= 0 && id < array.length) {
         array.splice(id, 1);
     }
 }
-
 function checkColl(obj, to_check, x, y) {
     for(let i = 0; i < to_check.length; i ++) {
         if (obj.collideWith(to_check[i], x, y)) {
@@ -562,5 +703,4 @@ function checkColl(obj, to_check, x, y) {
     }
     return false 
 }
-
-export {Game, GameObject, CollideBox, Sprite, TileMap,checkColl , importJson, importMAPJsonFromFile, deleteFromArray, TextObject}
+export {Game, GameObject, CollideBox, Sprite, TileMap,checkColl , importJson, importMAPJsonFromFile, deleteFromArray, TextObject, Menu}
