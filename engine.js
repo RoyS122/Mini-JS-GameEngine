@@ -122,18 +122,21 @@ class Game {
 		//let n = menu.container.cloneNode(true)
 		this.currentMenu = document.body.appendChild(menu.container)
 		this.pause = menu.pauseRequired
+        //if (this.currentMenu == true) {
+            this.window.style.opacity = 0.8
+        //}
 	}
 	exitMenu() {
 		this.currentMenu.remove()
 		this.currentMenu = false
 		this.pause = false
+        this.window.style.opacity = 1
 	}
 	gameLoop(timestamp) {
       
         window.requestAnimationFrame((timestamp) => this.gameLoop(timestamp))
         
         let deltaTime = timestamp - this.lastFrameTime;
-        
  
         if (deltaTime < this.targetDeltaTime) {
             // Trop tôt pour la prochaine mise à jour selon le cap des FPS.
@@ -154,11 +157,10 @@ class Game {
 	this.menus.forEach((menu) => {
         // Vérifier si la touche a été pressée une seule fois
         if (this.inputs_buffer[menu.key]) {
-            if (!this.currentMenu  ) {
+            if (!this.currentMenu) {
                 this.showMenu(menu);
-				
             } else {
-                this.exitMenu();
+                this.currentMenu.escape()
             }
 			this.inputs_buffer[menu.key] = false
         }
@@ -205,7 +207,7 @@ class Game {
 			this.GameObjects[i].onKill();
 			
 			if (this.GameObjects[i] instanceof TextObject) {
-				console.log(this.GameObjects[i])
+				//console.log(this.GameObjects[i])
 				this.GameObjects[i].container.remove();
 			}else{
 				this.GameObjects[i].sprite.container.remove();
@@ -570,27 +572,22 @@ class TextObject extends GameObject{
 // }
 //debut menu
 class Menu {
-	constructor(w, h, title, pause_require = true, key, z = 15) {
+	constructor(w, h, title, pause_require = true, key = undefined, z = 15) {
 		this.pauseRequired = pause_require
 		this.key = key
 		this.z = z
 		this.w = w
 		this.h = h;
-		this.title_obj = document.createElement("p")
+		this.title_obj = document.createElement("h1")
 		this.title_obj.textContent = title
-		this.title_obj.style.color = "white";
 		this.title_obj.style.opacity = 1;
 		this.title_obj.style.opacity = z + 1;
-		this.title_obj.style.textAlign = "center";
 		this.container = document.createElement("div")
-		this.container.style.width = w + "px";
-		this.container.style.height = h + "px";
-		this.container.style.backgroundColor = "rgba(0, 0, 0, 0.7)"
-		this.container.style.justifyContent = "center"
+		this.container.className = "menu";
 		this.container.style.zIndex = z
-		this.container.style.position = "absolute"
 		this.container.appendChild(this.title_obj)
 		this.buttons = []
+        this.texts = []
 	}
 	
 	addButton(title, funct) {
@@ -599,19 +596,26 @@ class Menu {
 		//console.log(this.buttons[b_id - 1])
 		
 		this.buttons[b_id - 1].textContent = title;
-		this.buttons[b_id - 1].style.alignSelf = "center";
-		this.buttons[b_id - 1].style.position = "relative"
-		this.buttons[b_id - 1].style.left	= String(this.w / 4) + "px";
-	//	this.buttons[b_id - 1].style.top = String(this.h / this.buttons.length / 2 * b_id) +"px"  
-		this.buttons[b_id - 1].style.textAlign = "center"
+		//this.buttons[b_id - 1].style.alignSelf = "center";
+		//this.buttons[b_id - 1].style.position = "relative"
+		//this.buttons[b_id - 1].style.left	= String(this.w / 4) + "px";
+	    //this.buttons[b_id - 1].style.top = String(this.h / this.buttons.length / 2 * b_id) +"px"  
+		//this.buttons[b_id - 1].style.textAlign = "center"
 		//this.buttons[b_id - 1].style. = "center";
 		this.buttons[b_id - 1].onclick = funct;
 		this.buttons[b_id - 1].style.zIndex = this.z + 1
 		this.container.appendChild(this.buttons[b_id - 1])
-		this.container.appendChild(document.createElement("br"))
-		this.container.appendChild(document.createElement("br"))
+		//this.container.appendChild(document.createElement("br"))
+		//this.container.appendChild(document.createElement("br"))
 		
 	}
+    
+    addText(content) {
+        let t_id = this.texts.push(document.createElement("p"))
+        this.texts[t_id - 1].style.zIndex = this.z + 1
+        this.texts[t_id - 1].textContent = content
+        this.container.appendChild(this.texts[t_id - 1])
+    }
 	
 }
 //endregion
@@ -625,12 +629,12 @@ async function importJson(path) {
       return response.json(); // Parse la réponse en JSON
     })
     .then(data => {
-    //   console.log(data);
+      //console.log(data);
       return data // Ici, vous avez accès à vos données JSON
       // Faites quelque chose avec vos données JSON
     })
     .catch(error => {
-        console.log(path)
+        //console.log(path)
       console.error('There has been a problem with your fetch operation:', error);
     });
 }
