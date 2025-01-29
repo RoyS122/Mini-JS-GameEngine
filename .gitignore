@@ -2,3 +2,7 @@
 ***utils.js
 ***index.html
 ***src
+*node_modules
+*.go
+*.mod
+.vscode
