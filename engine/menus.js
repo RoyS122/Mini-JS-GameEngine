@@ -1,3 +1,5 @@
+import { TextObject } from "./textobject.json"
+
 /**
  * A Game Menu(With things like buttons and Texts) 
  * WIP(Checkboxes and slidebars)
@@ -18,29 +20,56 @@ class Menu {
 		this.container.className = "menu";
 		this.container.style.zIndex = z
 		this.container.appendChild(this.title_obj)
-		this.buttons = []
-        this.texts = []
+		/** @type {Array<HTMLButtonElement>} */
+		this.buttons = [];
+
+		/** @type {Array<TextObject>} */
+		this.texts = [];
+
+		/** @type {Array<HTMLInputElement>} */
+		this.inputs = [];
 	}
-	
+
+	/**
+	* A method to add a button to the menu 
+	* @param {string} title - The title of the button
+	* @param {function} funct - The function to execute on click of the button
+	*/
 	addButton(title, funct) {
 		let b_id = this.buttons.push(document.createElement("button"));
-		
+
 		this.buttons[b_id - 1].textContent = title;
 		this.buttons[b_id - 1].onclick = funct;
 		this.buttons[b_id - 1].style.zIndex = this.z + 1
 		this.container.appendChild(this.buttons[b_id - 1])
-
-		
 	}
-    
-    addText(content) {
-        let t_id = this.texts.push(document.createElement("p"))
-        this.texts[t_id - 1].style.zIndex = this.z + 1
-        this.texts[t_id - 1].textContent = content
-        this.container.appendChild(this.texts[t_id - 1])
-    }
-	
+
+	/**
+	* A method to add a textfield on the menu
+	* @param {string} content - The content of the textfield
+	*/
+	addText(content) {
+		let t_id = this.texts.push(document.createElement("p"))
+		this.texts[t_id - 1].style.zIndex = this.z + 1
+		this.texts[t_id - 1].textContent = content
+		this.container.appendChild(this.texts[t_id - 1])
+	}
+
+	/**
+	* A method to add a button to the menu 
+	* @param {string} label - The title of the button
+	* @param {string} type - Type of input
+	* @param {Type} attemptedOutput - Type of the attempted output
+	* @param {function(any)} outputFunct - The function handled on change of the argment inputed is the input of the field
+	*/
+	addInput(label, type, outputFunct) {
+		let input_id = this.inputs.push(document.createElement("input"));
+
+		this.inputs[input_id - 1].type = type;
+		this.inputs[input_id - 1].onchange = outputFunct;
+	}
+
 }
 
 
-export {Menu}
+export { Menu }
