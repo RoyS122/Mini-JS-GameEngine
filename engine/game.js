@@ -1,5 +1,6 @@
 import { GameObject } from "./gameobject.js"
 import { CollideBox } from "./collisions.js"
+import { Menu } from "./menus.js"
 /**
  * Représente le moteur de jeu.
  * @class
@@ -146,16 +147,23 @@ class Game {
             this.window.appendChild(this.Rooms[room].gameObjects[id].container)
         }
     }
+    /**
+    * Add a menu to the game
+    * @param {Menu} menu - The menu to add to the game 
+    */
     addMenu(menu) {
         this.menus.push(menu)
     }
-
+    /**
+    * Show a menu
+    * @param {Menu} menu - The menu to show
+    */
     showMenu(menu) {
         //let n = menu.container.cloneNode(true)
-        this.currentMenu = document.body.appendChild(menu.container)
+        this.currentMenu = this.window.appendChild(menu.container)
         this.pause = menu.pauseRequired
         //if (this.currentMenu == true) {
-        this.window.style.opacity = 0.8
+        this.window.style.opacity = 1
         //}
     }
     exitMenu() {

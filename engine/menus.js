@@ -1,4 +1,4 @@
-import { TextObject } from "./textobject.json"
+import { TextObject } from "./textobject.js"
 
 /**
  * A Game Menu(With things like buttons and Texts) 
@@ -7,8 +7,8 @@ import { TextObject } from "./textobject.json"
  */
 class Menu {
 	constructor(w, h, title, pause_require = true, key = undefined, z = 15) {
-		this.pauseRequired = pause_require
-		this.key = key
+		this.pauseRequired = pause_require;
+		this.key = key;
 		this.z = z
 		this.w = w
 		this.h = h;
@@ -20,6 +20,7 @@ class Menu {
 		this.container.className = "menu";
 		this.container.style.zIndex = z
 		this.container.appendChild(this.title_obj)
+
 		/** @type {Array<HTMLButtonElement>} */
 		this.buttons = [];
 
@@ -28,6 +29,10 @@ class Menu {
 
 		/** @type {Array<HTMLInputElement>} */
 		this.inputs = [];
+
+		/** @type {Array<HTMLLabelElement>} */
+		this.labels = [];
+
 	}
 
 	/**
@@ -65,8 +70,17 @@ class Menu {
 	addInput(label, type, outputFunct) {
 		let input_id = this.inputs.push(document.createElement("input"));
 
+		let lab_id = this.labels.push(document.createElement("label"));
+
 		this.inputs[input_id - 1].type = type;
-		this.inputs[input_id - 1].onchange = outputFunct;
+		this.inputs[input_id - 1].id = "id_input_" + input_id.toString();
+		this.inputs[input_id - 1].addEventListener("change", outputFunct);
+
+		this.labels[lab_id - 1].htmlFor = this.inputs[input_id - 1].id;
+		this.labels[lab_id - 1].textContent = label;
+
+		this.container.appendChild(this.labels[lab_id - 1]);
+		this.container.appendChild(this.inputs[input_id - 1]);
 	}
 
 }
